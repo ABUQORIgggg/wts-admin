@@ -25,7 +25,7 @@ const Sidebar = () => {
               className={`flex items-center gap-4 py-2 px-5 rounded-lg transition-all duration-300 ${
                 location.pathname === "/"
                   ? "bg-primary text-white shadow-md"
-                  : "hover:bg-primary hover:text-white"
+                  : "hover:bg-info hover:text-white"
               }`}
             >
               <FaHome size={20} /> Home
@@ -37,7 +37,7 @@ const Sidebar = () => {
               className={`flex items-center gap-4 py-2 px-5 rounded-lg transition-all duration-300 ${
                 location.pathname === "/products"
                   ? "bg-primary text-white shadow-md"
-                  : "hover:bg-primary hover:text-white"
+                  : "hover:bg-info hover:text-white"
               }`}
             >
               <FaBoxOpen size={20} /> Products
@@ -50,7 +50,7 @@ const Sidebar = () => {
               className={`flex items-center gap-4 py-2 px-5 rounded-lg transition-all duration-300 ${
                 location.pathname === "/applications"
                   ? "bg-primary text-white shadow-md"
-                  : "hover:bg-primary hover:text-white"
+                  : "hover:bg-info hover:text-white"
               }`}
             >
               <FaClipboardList size={20} /> Applications
@@ -62,7 +62,7 @@ const Sidebar = () => {
               className={`flex items-center gap-4 py-2 px-5 rounded-lg transition-all duration-300 ${
                 location.pathname === "/news"
                   ? "bg-primary text-white shadow-md"
-                  : "hover:bg-primary hover:text-white"
+                  : "hover:bg-info hover:text-white"
               }`}
             >
               <FaNewspaper size={20} /> News
@@ -74,7 +74,7 @@ const Sidebar = () => {
               className={`flex items-center gap-4 py-2 px-5 rounded-lg transition-all duration-300 ${
                 location.pathname === "/advertising"
                   ? "bg-primary text-white shadow-md"
-                  : "hover:bg-primary hover:text-white"
+                  : "hover:bg-info hover:text-white"
               }`}
             >
               <FaBullhorn size={20} /> Advertising

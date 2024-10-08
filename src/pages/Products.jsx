@@ -1,7 +1,8 @@
 // components/Products.jsx
-import React, { useEffect, useState } from 'react';
-import { FaTrash } from 'react-icons/fa';
+import React, { useEffect, useState } from "react";
+import { FaTrash } from "react-icons/fa";
 import { FaSpinner } from "react-icons/fa"; // Импортируем иконку загрузки
+import { IoIosAddCircle } from "react-icons/io";
 
 const Products = () => {
   const [data, setData] = useState([]);
@@ -9,31 +10,31 @@ const Products = () => {
 
   // Initial form data with all fields
   const [formData, setFormData] = useState({
-    name: '',
+    name: "",
     images: [], // Changed from 'image' to 'images' and initialized as an array
-    description: '',
-    price: '',
-    category: '',
-    stock: '',
-    rating: '',
-    volume: '',
-    discount_price: '',
+    description: "",
+    price: "",
+    category: "",
+    stock: "",
+    rating: "",
+    volume: "",
+    discount_price: "",
     promotion: false,
-    ruler: '',
-    oils_type: '',
-    fidbek: '',
+    ruler: "",
+    oils_type: "",
+    fidbek: "",
   });
 
   const handleFormChange = (e) => {
     const { name, value, files, type, checked } = e.target;
 
-    if (type === 'file') {
+    if (type === "file") {
       // Handle multiple file uploads
       setFormData((prevFormData) => ({
         ...prevFormData,
         [name]: files,
       }));
-    } else if (type === 'checkbox') {
+    } else if (type === "checkbox") {
       setFormData((prevFormData) => ({
         ...prevFormData,
         [name]: checked,
@@ -48,91 +49,90 @@ const Products = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Проверка, что discount_price меньше чем price
     if (formData.discount_price >= formData.price) {
-      alert('Цена со скидкой должна быть меньше первоначальной цены.');
+      alert("Цена со скидкой должна быть меньше первоначальной цены.");
       return; // Остановить отправку формы, если проверка не пройдена
     }
-  
+
     const formDataToSend = new FormData();
     Object.keys(formData).forEach((key) => {
-      if (key === 'images') {
+      if (key === "images") {
         // Append each image file
         for (let i = 0; i < formData.images.length; i++) {
-          formDataToSend.append('images', formData.images[i]);
+          formDataToSend.append("images", formData.images[i]);
         }
       } else {
         formDataToSend.append(key, formData[key]);
       }
     });
-  
+
     try {
-      const response = await fetch('http://localhost:5000/api/v1/card/create', {
-        method: 'POST',
+      const response = await fetch("http://localhost:5000/api/v1/card/create", {
+        method: "POST",
         body: formDataToSend,
       });
-  
+
       if (!response.ok) {
         const errorResponse = await response.json();
-        console.error('Error response:', errorResponse);
+        console.error("Error response:", errorResponse);
         throw new Error(`Error adding product: ${response.statusText}`);
       }
-  
+
       const result = await response.json();
       const newProduct = result.product;
-  
+
       setData((prevData) => [...prevData, newProduct]);
-      document.getElementById('my_modal_3').close();
+      document.getElementById("my_modal_3").close();
       // Reset form data
       setFormData({
-        name: '',
+        name: "",
         images: [],
-        description: '',
-        price: '',
-        category: '',
-        stock: '',
-        rating: '',
-        volume: '',
-        discount_price: '',
+        description: "",
+        price: "",
+        category: "",
+        stock: "",
+        rating: "",
+        volume: "",
+        discount_price: "",
         promotion: false,
-        ruler: '',
-        oils_type: '',
-        fidbek: '',
+        ruler: "",
+        oils_type: "",
+        fidbek: "",
       });
     } catch (error) {
-      console.error('Error adding product:', error);
+      console.error("Error adding product:", error);
     }
   };
-  
 
   const handleDelete = async (id) => {
     try {
       const response = await fetch(`http://localhost:5000/api/v1/card/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete product');
+        throw new Error("Failed to delete product");
       }
 
       setData((prevData) => prevData.filter((product) => product._id !== id));
     } catch (error) {
-      console.error('Error deleting product:', error);
+      console.error("Error deleting product:", error);
     }
   };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/v1/card');
+        const response = await fetch("http://localhost:5000/api/v1/card");
         if (!response.ok) {
-          throw new Error('Failed to fetch products');
+          throw new Error("Failed to fetch products");
         }
         const products = await response.json();
         setData(products);
       } catch (error) {
-        console.error('Error fetching products:', error);
+        console.error("Error fetching products:", error);
       } finally {
         setLoading(false);
       }
@@ -142,24 +142,28 @@ const Products = () => {
   }, []);
 
   if (loading) {
-    return <div className="text-center text-gray-600"> 
-                               <FaSpinner className="animate-spin text-5xl text-gray-50" /> {/* Иконка загрузки */}</div>;
+    return (
+      <div className="text-center text-gray-600">
+        <FaSpinner className="animate-spin text-5xl text-gray-50" />{" "}
+      </div>
+    );
   }
 
   return (
     <div className="p-5 flex flex-col w-full gap-5">
-      <button 
-        className="btn mb-5 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg" 
-        onClick={() => document.getElementById('my_modal_3').showModal()}
+      <button
+        className="btn mb-5 bg-info hover:bg-info/70 text-white py-2 px-4 rounded-lg border-none transition-all duration-300"
+        onClick={() => document.getElementById("my_modal_3").showModal()}
       >
+        <IoIosAddCircle />
         Add Product
       </button>
 
       <dialog id="my_modal_3" className="modal">
         <div className="modal-box text-white relative bg-gray-800 rounded-lg p-8">
-          <button 
+          <button
             className="absolute top-3 right-3 text-gray-400 hover:text-gray-100 transition"
-            onClick={() => document.getElementById('my_modal_3').close()}
+            onClick={() => document.getElementById("my_modal_3").close()}
           >
             ✕
           </button>
@@ -168,36 +172,36 @@ const Products = () => {
             {/* Form Fields */}
             <label className="block">
               <span className="text-gray-300">Name</span>
-              <input 
-                type="text" 
-                name="name" 
-                value={formData.name} 
-                onChange={handleFormChange} 
-                className="input w-full mt-1 p-2 bg-gray-700 rounded-md text-white" 
-                required 
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleFormChange}
+                className="input w-full mt-1 p-2 bg-gray-700 rounded-md text-white"
+                required
               />
             </label>
 
             <label className="block">
               <span className="text-gray-300">Category</span>
-              <input 
-                type="text" 
-                name="category" 
-                value={formData.category} 
-                onChange={handleFormChange} 
-                className="input w-full mt-1 p-2 bg-gray-700 rounded-md text-white" 
+              <input
+                type="text"
+                name="category"
+                value={formData.category}
+                onChange={handleFormChange}
+                className="input w-full mt-1 p-2 bg-gray-700 rounded-md text-white"
                 required
               />
             </label>
 
             <label className="block">
               <span className="text-gray-300">Rating</span>
-              <input 
-                type="number" 
-                name="rating" 
-                value={formData.rating} 
-                onChange={handleFormChange} 
-                className="input w-full mt-1 p-2 bg-gray-700 rounded-md text-white" 
+              <input
+                type="number"
+                name="rating"
+                value={formData.rating}
+                onChange={handleFormChange}
+                className="input w-full mt-1 p-2 bg-gray-700 rounded-md text-white"
                 required
                 min="0"
                 max="5"
@@ -207,12 +211,12 @@ const Products = () => {
 
             <label className="block">
               <span className="text-gray-300">Stock</span>
-              <input 
-                type="number" 
-                name="stock" 
-                value={formData.stock} 
-                onChange={handleFormChange} 
-                className="input w-full mt-1 p-2 bg-gray-700 rounded-md text-white" 
+              <input
+                type="number"
+                name="stock"
+                value={formData.stock}
+                onChange={handleFormChange}
+                className="input w-full mt-1 p-2 bg-gray-700 rounded-md text-white"
                 required
                 min="0"
               />
@@ -220,37 +224,37 @@ const Products = () => {
 
             <label className="block">
               <span className="text-gray-300">Ruler</span>
-              <input 
-                type="text" 
-                name="ruler" 
-                value={formData.ruler} 
-                onChange={handleFormChange} 
-                className="input w-full mt-1 p-2 bg-gray-700 rounded-md text-white" 
+              <input
+                type="text"
+                name="ruler"
+                value={formData.ruler}
+                onChange={handleFormChange}
+                className="input w-full mt-1 p-2 bg-gray-700 rounded-md text-white"
                 required
               />
             </label>
 
             <label className="block">
               <span className="text-gray-300">Volume</span>
-              <input 
-                type="text" 
-                name="volume" 
-                value={formData.volume} 
-                onChange={handleFormChange} 
-                className="input w-full mt-1 p-2 bg-gray-700 rounded-md text-white" 
+              <input
+                type="text"
+                name="volume"
+                value={formData.volume}
+                onChange={handleFormChange}
+                className="input w-full mt-1 p-2 bg-gray-700 rounded-md text-white"
                 required
               />
             </label>
 
             <label className="block">
               <span className="text-gray-300">Images</span>
-              <input 
-                type="file" 
-                name="images" 
-                onChange={handleFormChange} 
-                className="file-input w-full mt-1 p-2 bg-gray-700 rounded-md text-white" 
+              <input
+                type="file"
+                name="images"
+                onChange={handleFormChange}
+                className="file-input w-full mt-1 p-2 bg-gray-700 rounded-md text-white"
                 multiple // Allow multiple file selection
-                required 
+                required
               />
             </label>
 
@@ -267,12 +271,12 @@ const Products = () => {
 
             <label className="block">
               <span className="text-gray-300">Price</span>
-              <input 
-                type="number" 
-                name="price" 
-                value={formData.price} 
-                onChange={handleFormChange} 
-                className="input w-full mt-1 p-2 bg-gray-700 rounded-md text-white" 
+              <input
+                type="number"
+                name="price"
+                value={formData.price}
+                onChange={handleFormChange}
+                className="input w-full mt-1 p-2 bg-gray-700 rounded-md text-white"
                 required
                 min="0"
                 step="0.01"
@@ -281,12 +285,12 @@ const Products = () => {
 
             <label className="block">
               <span className="text-gray-300">Discount Price</span>
-              <input 
-                type="number" 
-                name="discount_price" 
-                value={formData.discount_price} 
-                onChange={handleFormChange} 
-                className="input w-full mt-1 p-2 bg-gray-700 rounded-md text-white" 
+              <input
+                type="number"
+                name="discount_price"
+                value={formData.discount_price}
+                onChange={handleFormChange}
+                className="input w-full mt-1 p-2 bg-gray-700 rounded-md text-white"
                 min="0"
                 step="0.01"
               />
@@ -294,29 +298,32 @@ const Products = () => {
 
             <label className="block">
               <span className="text-gray-300">Promotion</span>
-              <input 
-                type="checkbox" 
-                name="promotion" 
-                checked={formData.promotion} 
-                onChange={handleFormChange} 
-                className="checkbox mt-1 bg-gray-700 rounded-md text-white" 
+              <input
+                type="checkbox"
+                name="promotion"
+                checked={formData.promotion}
+                onChange={handleFormChange}
+                className="checkbox mt-1 bg-gray-700 rounded-md text-white"
               />
             </label>
 
             <label className="block">
               <span className="text-gray-300">Oils Type</span>
-              <input 
-                type="text" 
-                name="oils_type" 
-                value={formData.oils_type} 
-                onChange={handleFormChange} 
-                className="input w-full mt-1 p-2 bg-gray-700 rounded-md text-white" 
+              <input
+                type="text"
+                name="oils_type"
+                value={formData.oils_type}
+                onChange={handleFormChange}
+                className="input w-full mt-1 p-2 bg-gray-700 rounded-md text-white"
               />
             </label>
 
             {/* Add any other required fields here */}
 
-            <button type="submit" className="btn bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg">
+            <button
+              type="submit"
+              className="btn bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg"
+            >
               Add Product
             </button>
           </form>
@@ -336,21 +343,24 @@ const Products = () => {
                 <th className="text-gray-300">Actions</th>
               </tr>
             </thead>
-            <tbody className='w-full'>
+            <tbody className="w-full">
               {data.map((product) => (
-                <tr key={product._id} className='w-full'>
+                <tr key={product._id} className="w-full">
                   <td>{product.name}</td>
                   <td>
-                      <img 
-                        src={`http://localhost:5000/${product.image}`} 
-                        alt={product.name} 
-                        className="w-16 h-16 object-cover inline-block mr-2" 
-                      />
+                    <img
+                      src={`http://localhost:5000/${product.image}`}
+                      alt={product.name}
+                      className="w-16 h-16 object-cover inline-block mr-2"
+                    />
                   </td>
                   <td>{product.description}</td>
                   <td>${product.price}</td>
                   <td>
-                    <button className="btn btn-danger" onClick={() => handleDelete(product._id)}>
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => handleDelete(product._id)}
+                    >
                       <FaTrash />
                     </button>
                   </td>

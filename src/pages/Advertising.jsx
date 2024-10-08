@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaPlus, FaTrash } from 'react-icons/fa';
+import { FaPlus, FaTrash,FaClipboardList,FaBullhorn, } from 'react-icons/fa';
 import { FaSpinner } from "react-icons/fa"; // Импортируем иконку загрузки
 
 const Advertising = () => {
@@ -76,7 +76,7 @@ const Advertising = () => {
     return (
         <div className="p-5 flex flex-col w-10/12 gap-5">
             <div className="bg-base-200 p-5 w-full flex justify-between items-center rounded-2xl">
-                <h1 className="text-2xl font-bold text-primary">Advertising</h1>
+                <h1 className="text-2xl font-bold text-primary flex gap-2"  >     <FaBullhorn className='size-9'/>   Advertising</h1>
                 <button className="btn btn-primary flex items-center" onClick={() => document.getElementById('my_modal_advertising').showModal()}>
                     <FaPlus className="mr-2" /> Добавить
                 </button>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FaSpinner } from "react-icons/fa";
+import { IoMdPaper } from 'react-icons/io'; // Example icon
 
 const News = () => {
   const [data, setData] = useState([]);
@@ -114,7 +115,9 @@ const News = () => {
   return (
     <div className="p-3 flex flex-col w-10/12 gap-5">
       <div className="bg-base-300 p-5 w-full flex justify-between items-center rounded-2xl">
-        <h1 className="text-3xl font-bold text-primary">News</h1>
+        <h1 className="text-3xl font-bold text-primary flex text-center gap-2">
+        <IoMdPaper className="size-9" /> 
+          News</h1>
         <button className="btn btn-primary" onClick={() => document.getElementById('my_modal_news').showModal()}>
           Добавить
         </button>
