@@ -1,15 +1,12 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { FaBullhorn, FaClipboardList, FaNewspaper, FaHome, FaBoxOpen, FaListAlt, FaShoppingCart } from 'react-icons/fa';
-import { BiSolidDiscount } from "react-icons/bi";
-import { AiOutlineAppstore } from "react-icons/ai"; // Новая иконка
-import Logout from "./Logout";
+import { FaBullhorn, FaClipboardList, FaNewspaper, FaHome, FaBoxOpen, FaLayerGroup, FaTags } from 'react-icons/fa'; // добавляем FaTags для Category
 
-const Sidebar = () => {
+const Sidebar = ({ theme }) => {
   const location = useLocation();
 
   return (
-    <div className="drawer lg:drawer-open bg-base-300 w-full lg:w-2/12 shadow-lg">
+    <div className={`drawer lg:drawer-open overflow-y-hidden ${theme === 'dark' ? 'bg-gray-900' : 'bg-white'} text-${theme === 'dark' ? 'white' : 'black'} w-full lg:w-2/12 shadow-lg`}>
       <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content flex flex-col items-center justify-center">
         <label htmlFor="my-drawer-2" className="btn btn-primary drawer-button lg:hidden">
@@ -18,66 +15,79 @@ const Sidebar = () => {
       </div>
       <div className="drawer-side">
         <label htmlFor="my-drawer-2" aria-label="close sidebar" className="drawer-overlay"></label>
-        <ul className="menu text-base-content min-h-full w-full p-4 gap-5">
+        <ul className="menu min-h-full w-full p-4 gap-5">
           <li>
             <Link
-              to="/app/home" 
+              to="/app/home"
               className={`flex items-center gap-4 py-2 px-5 rounded-lg transition-all duration-300 ${
-                location.pathname === "/"
-                  ? "bg-primary text-white shadow-md"
-                  : "hover:bg-info hover:text-white"
+                location.pathname === "/app/home" ? "bg-blue-600" : "hover:bg-blue-500"
               }`}
             >
-              <FaHome size={20} /> Home
+              <FaHome size={20} /> Главная страница 
             </Link>
           </li>
           <li>
             <Link
-              to="/app/products" 
+              to="/app/products"
               className={`flex items-center gap-4 py-2 px-5 rounded-lg transition-all duration-300 ${
-                location.pathname === "/products"
-                  ? "bg-primary text-white shadow-md"
-                  : "hover:bg-info hover:text-white"
+                location.pathname === "/app/products" ? "bg-blue-600" : "hover:bg-blue-500"
               }`}
             >
-              <FaBoxOpen size={20} /> Products
-            </Link>
-          </li>
-          
-          <li>
-            <Link
-              to="/app/applications" 
-              className={`flex items-center gap-4 py-2 px-5 rounded-lg transition-all duration-300 ${
-                location.pathname === "/applications"
-                  ? "bg-primary text-white shadow-md"
-                  : "hover:bg-info hover:text-white"
-              }`}
-            >
-              <FaClipboardList size={20} /> Applications
+              <FaBoxOpen size={20} /> Продукты
             </Link>
           </li>
           <li>
             <Link
-              to="/app/news" 
+              to="/app/applications"
               className={`flex items-center gap-4 py-2 px-5 rounded-lg transition-all duration-300 ${
-                location.pathname === "/news"
-                  ? "bg-primary text-white shadow-md"
-                  : "hover:bg-info hover:text-white"
+                location.pathname === "/app/applications" ? "bg-blue-600" : "hover:bg-blue-500"
               }`}
             >
-              <FaNewspaper size={20} /> News
+              <FaClipboardList size={20} /> Заявки
             </Link>
           </li>
           <li>
             <Link
-              to="/app/advertising" 
+              to="/app/news"
               className={`flex items-center gap-4 py-2 px-5 rounded-lg transition-all duration-300 ${
-                location.pathname === "/advertising"
-                  ? "bg-primary text-white shadow-md"
-                  : "hover:bg-info hover:text-white"
+                location.pathname === "/app/news" ? "bg-blue-600" : "hover:bg-blue-500"
               }`}
             >
-              <FaBullhorn size={20} /> Advertising
+              <FaNewspaper size={20} /> Новости
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/app/advertising"
+              className={`flex items-center gap-4 py-2 px-5 rounded-lg transition-all duration-300 ${
+                location.pathname === "/app/advertising" ? "bg-blue-600" : "hover:bg-blue-500"
+              }`}
+            >
+              <FaBullhorn size={20} /> Баннер и Реклама 
+            </Link>
+          </li>
+
+          {/* Изменяем иконку для Layout */}
+          <li>
+            <Link
+              to="/app/layout"
+              className={`flex items-center gap-4 py-2 px-5 rounded-lg transition-all duration-300 ${
+                location.pathname === "/app/layout" ? "bg-blue-600" : "hover:bg-blue-500"
+              }`}
+            >
+              <FaLayerGroup size={20} /> Макет
+            </Link>
+          </li>
+
+          {/* Иконка для Category */}
+          <li>
+            <Link
+              to="/app/category"
+              className={`flex items-center gap-4 py-2 px-5 rounded-lg transition-all duration-300 ${
+                location.pathname === "/app/category" ? "bg-blue-600" : "hover:bg-blue-500"
+              }`}
+            >
+              <FaTags size={20} /> Категория
             </Link>
           </li>
         </ul>

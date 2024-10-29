@@ -1,84 +1,142 @@
 import React, { useEffect, useState } from 'react';
-import { FaPlus, FaTrash,FaClipboardList,FaBullhorn, } from 'react-icons/fa';
-import { FaSpinner } from "react-icons/fa"; // Импортируем иконку загрузки
+import { FaPlus, FaTrash, FaSpinner, FaBullhorn, FaEdit } from 'react-icons/fa';
 
 const Advertising = () => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [formData, setFormData] = useState({
-        image: null,
+        images: [],
+        title: '',
         description: '',
     });
+    const [isEditing, setIsEditing] = useState(false);
+    const [editingId, setEditingId] = useState(null); // Store the ID of the banner being edited
 
+    // Fetch all banners from the API
     const dataRequest = async () => {
+        setLoading(true);
         try {
-            const response = await fetch('http://localhost:5000/api/v1/banner');
+            const response = await fetch('http://localhost:9000/api/v1/banners');
+            if (!response.ok) throw new Error('Failed to fetch banners from API');
             const ads = await response.json();
-            setData(ads);
+            setData(ads.data || []);
         } catch (error) {
-            console.error('Error fetching advertising:', error);
+            console.error('Error fetching banners:', error);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        dataRequest();
+        dataRequest(); // Fetch data from API on mount
     }, []);
 
+    // Handle form input changes
     const handleFormChange = (e) => {
         const { name, value, files } = e.target;
         setFormData((prevFormData) => ({
             ...prevFormData,
-            [name]: files ? files[0] : value,
+            [name]: files ? Array.from(files) : value,
         }));
     };
 
+    // Handle form submission (Create or Edit)
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-        
+    
+        // Validation check for required fields
+        if (!formData.title || !formData.description || (formData.images.length < 1 && !isEditing)) {
+            alert('Please fill out all required fields');
+            return;
+        }
+    
         const formDataToSend = new FormData();
-        formDataToSend.append('image', formData.image);
+        formDataToSend.append('title', formData.title);
         formDataToSend.append('description', formData.description);
     
+        // Append images if there are any
+        formData.images.forEach((image) => {
+            formDataToSend.append('images', image);
+        });
+    
         try {
-            const response = await fetch('http://localhost:5000/api/v1/banner', {
-                method: 'POST',
-                body: formDataToSend,
-            });
-            
-            if (!response.ok) {
-                throw new Error('Error adding advertisement');
+            let response;
+            if (isEditing && editingId) {
+                // PUT request for updating an existing banner
+                response = await fetch(`http://localhost:9000/api/v1/banners/${editingId}`, {
+                    method: 'PUT',
+                    body: formDataToSend,
+                });
+            } else {
+                // POST request for adding a new banner
+                response = await fetch('http://localhost:9000/api/v1/banners/create', {
+                    method: 'POST',
+                    body: formDataToSend,
+                });
             }
-            
-            const newAd = await response.json();
-            setData((prevData) => [...prevData, newAd]);
+    
+            if (!response.ok) {
+                const errorResponse = await response.json();
+                throw new Error(errorResponse.data || 'Error adding/updating advertisement');
+            }
+    
+            const updatedBanner = await response.json();
+            let updatedData = isEditing 
+                ? data.map((ad) => (ad._id === editingId ? updatedBanner.data : ad)) 
+                : [...data, updatedBanner.data];
+    
+            // Update state and close modal
+            setData(updatedData);
             document.getElementById('my_modal_advertising').close();
+            alert('Banner successfully saved!');
+            setFormData({ images: [], title: '', description: '' });
         } catch (error) {
-            console.error('Error adding advertisement:', error);
+            console.error('Error adding/updating advertisement:', error.message);
+            alert(`Failed to save the banner: ${error.message}`);
         }
     };
+    
 
+    // Handle deletion of a banner
     const handleDelete = async (id) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/v1/banner/${id}`, {
+            const response = await fetch(`http://localhost:9000/api/v1/banners/${id}`, {
                 method: 'DELETE',
             });
             if (!response.ok) {
                 throw new Error('Error deleting advertisement');
             }
-            setData((prevData) => prevData.filter((ad) => ad._id !== id));
+            const updatedData = data.filter((ad) => ad._id !== id);
+            setData(updatedData);
         } catch (error) {
             console.error('Error deleting advertisement:', error);
         }
     };
 
+    // Handle editing of a banner
+    const handleEdit = (ad) => {
+        setFormData({
+            title: ad.title,
+            description: ad.description,
+            images: [], // Do not prefill images since they are files
+        });
+        setEditingId(ad._id);
+        setIsEditing(true);
+        document.getElementById('my_modal_advertising').showModal();
+    };
+
     return (
-        <div className="p-5 flex flex-col w-10/12 gap-5">
+        <div className="p-5 flex flex-col w-10/15 gap-5 text-white">
             <div className="bg-base-200 p-5 w-full flex justify-between items-center rounded-2xl">
-                <h1 className="text-2xl font-bold text-primary flex gap-2"  >     <FaBullhorn className='size-9'/>   Advertising</h1>
-                <button className="btn btn-primary flex items-center" onClick={() => document.getElementById('my_modal_advertising').showModal()}>
-                    <FaPlus className="mr-2" /> Добавить
+                <h1 className="text-2xl font-bold text-primary flex gap-2">
+                    <FaBullhorn className="size-9" /> Баннер и Реклама 
+                </h1>
+                <button className="btn btn-primary flex items-center" onClick={() => {
+                    setIsEditing(false); // Set to add mode
+                    setFormData({ images: [], title: '', description: '' }); // Clear form for new banner
+                    document.getElementById('my_modal_advertising').showModal();
+                }}>
+                    <FaPlus className="mr-2" /> Добавить 
                 </button>
             </div>
 
@@ -89,49 +147,66 @@ const Advertising = () => {
                     </form>
                     <form onSubmit={handleFormSubmit}>
                         <label className="input input-bordered flex items-center gap-2 mt-10">
-                            Image
-                            <input type="file" name="image" onChange={handleFormChange} className="grow" />
+                        Заголовок
+                            <input type="text" name="title" value={formData.title} onChange={handleFormChange} className="grow" placeholder="Title" required />
                         </label>
                         <label className="input input-bordered flex items-center gap-2 mt-5">
-                            Description
-                            <input type="text" name="description" value={formData.description} onChange={handleFormChange} className="grow" placeholder="Description" />
+                        Изображение
+                            <input type="file" name="images" onChange={handleFormChange} className="grow" accept="image/*" multiple={!isEditing} />
                         </label>
-                        <button type="submit" className="btn mt-5">Add Advertising</button>
+                        <label className="input input-bordered flex items-center gap-2 mt-5">
+                        Описание
+                            <input type="text" name="description" value={formData.description} onChange={handleFormChange} className="grow" placeholder="Description" required />
+                        </label>
+                        <button type="submit" className="btn mt-5">{isEditing ? 'Edit Banner' : 'Add Banner'}</button>
                     </form>
                 </div>
             </dialog>
 
-            <div className='p-5 w-full flex justify-between items-center bg-base-200 rounded-3xl'>
+            <div className="p-5 w-full flex justify-between items-center bg-base-200 rounded-3xl">
                 <div className="overflow-x-auto w-full">
                     <table className="table w-full">
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Image</th>
-                                <th>Description</th>
-                                <th>Actions</th>
+                                <th>Изображение</th>
+                                <th>Заголовок</th>
+                                <th>Описание</th>
+                                <th>Действия</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {data.map((ad) => (
-                                <tr key={ad._id}>
-                                    <td>{ad._id}</td>
-                                    <td>
-                                        <img src={`http://localhost:5000${ad.image_url}`} alt="Ad" style={{ width: '100px', height: 'auto' }} />
-                                    </td>
-                                    <td>{ad.description}</td>
-                                    <td>
-                                        <button className="btn" onClick={() => handleDelete(ad._id)}>
-                                            <FaTrash className="mr-2" /> Удалить
-                                        </button>
-                                    </td>
+                            {Array.isArray(data) && data.length > 0 ? (
+                                data.map((ad) => (
+                                    <tr key={ad._id}>
+                                        <td>{ad._id}</td>
+                                        <td>
+                                            {ad.images.map((image, index) => (
+                                                <img key={index} src={`http://localhost:9000${image}`} alt="Ad" style={{ width: '100px', height: 'auto', marginRight: '5px' }} />
+                                            ))}
+                                        </td>
+                                        <td>{ad.title}</td>
+                                        <td>{ad.description.length > 50 ? ad.description.slice(0, 50) + '...' : ad.description}</td>
+                                        <td>
+                                            <button className="btn mr-2 bg-slate-800" onClick={() => handleEdit(ad)}>
+                                                <FaEdit className="mr-2" /> Редактировать
+                                            </button>
+                                            <button className="btn bg-red-700" onClick={() => handleDelete(ad._id)}>
+                                                <FaTrash className="mr-2" /> Удалить
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="5" className="text-center">Нет доступных баннеров</td>
                                 </tr>
-                            ))}
+                            )}
                         </tbody>
                     </table>
                     {loading && (
-                        <div className="flex justify-center mt-5 ">
-                            <FaSpinner className="animate-spin text-5xl text-gray-50" /> {/* Иконка загрузки */}
+                        <div className="flex justify-center mt-5">
+                            <FaSpinner className="animate-spin text-5xl text-gray-50" />
                         </div>
                     )}
                 </div>

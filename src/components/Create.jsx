@@ -4,7 +4,8 @@ const Create = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState(''); // Новая переменная состояния для роли
+  const [role, setRole] = useState('');
+  const [error, setError] = useState('');
 
   const openModal = () => {
     setModalIsOpen(true);
@@ -12,16 +13,22 @@ const Create = () => {
 
   const closeModal = () => {
     setModalIsOpen(false);
-    setUsername('');  // Очистка полей после закрытия
+    setUsername('');
     setPassword('');
-    setRole(''); // Очистка роли
+    setRole('');
+    setError('');
   };
 
   const handleCreate = async () => {
-    const partnerData = { username, password, role }; // Теперь мы включаем role
+    if (!username || !password || !role) {
+      setError('Please fill in all fields');
+      return;
+    }
+
+    const partnerData = { username, password, role };
 
     try {
-      const response = await fetch('http://localhost:5000/api/v1/admin/create-partner', {
+      const response = await fetch('http://localhost:9000/api/v1/auth/create-partnyor', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -29,37 +36,38 @@ const Create = () => {
         body: JSON.stringify(partnerData),
       });
 
-      // Логируем статус и текст ответа
-      console.log('Статус ответа:', response.status);
       const result = await response.json();
-      console.log('Текст ответа:', result);
+      console.log('Response:', result);
 
       if (!response.ok) {
-        throw new Error(result.message || 'Ошибка при добавлении партнера');
+        throw new Error(result.message || 'Error creating partner');
       }
 
-      console.log('Партнер успешно добавлен:', result);
-      closeModal(); // Закрываем модал после успешного создания
+      console.log('Partner created successfully:', result);
+      closeModal();
     } catch (error) {
-      console.error('Ошибка:', error);
+      console.error('Error:', error);
+      setError(error.message);
     }
-  };
+};
+
 
   return (
-    <div className="flex flex-col items-center justify-center w-full">
+    <div className="flex flex-col items-center justify-center w-full text-white">
       <button
         onClick={openModal}
         className="btn btn-primary text-white"
       >
-        Создать
+        Create Partner
       </button>
 
       {modalIsOpen && (
         <dialog open className="modal">
           <div className="modal-box">
-            <h2 className="text-xl font-bold mb-4">Создать партнера</h2>
+            <h2 className="text-xl font-bold mb-4">Create Partner</h2>
+            {error && <p className="text-red-500 mb-4">{error}</p>}
             <div className="mb-4">
-              <label className="block mb-2">Имя пользователя:</label>
+              <label className="block mb-2">Username:</label>
               <input
                 type="text"
                 value={username}
@@ -69,7 +77,7 @@ const Create = () => {
               />
             </div>
             <div className="mb-4">
-              <label className="block mb-2">Пароль:</label>
+              <label className="block mb-2">Password:</label>
               <input
                 type="password"
                 value={password}
@@ -79,7 +87,7 @@ const Create = () => {
               />
             </div>
             <div className="mb-4">
-              <label className="block mb-2">Роль:</label>
+              <label className="block mb-2">Role:</label>
               <input
                 type="text"
                 value={role}
@@ -93,13 +101,13 @@ const Create = () => {
                 onClick={handleCreate}
                 className="bg-green-500 text-white font-bold py-2 px-4 rounded hover:bg-green-600 transition duration-200 ease-in-out"
               >
-                Создать
+                Create
               </button>
               <button
                 onClick={closeModal}
                 className="bg-gray-300 text-black font-bold py-2 px-4 rounded hover:bg-gray-400 transition duration-200 ease-in-out"
               >
-                Закрыть
+                Close
               </button>
             </div>
           </div>

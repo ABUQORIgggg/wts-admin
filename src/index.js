@@ -15,6 +15,8 @@ import store, { persistor } from "./redux/store";
 import Applications from "./pages/Applications";
 import News from "./pages/News";
 import Advertising from "./pages/Advertising";
+import Layout from "./pages/Layout";
+import Category from "./pages/Category";
 
 const router = createBrowserRouter([
   {
@@ -56,6 +58,18 @@ const router = createBrowserRouter([
         <Advertising />
         </PrivateRoute>,
       },
+      {
+        path: "layout", // Убираем слэш и приводим путь к нижнему регистру
+        element: <PrivateRoute >
+        <Layout />
+        </PrivateRoute>,
+      },
+      {
+        path: "category", // Убираем слэш и приводим путь к нижнему регистру
+        element: <PrivateRoute >
+        <Category />
+        </PrivateRoute>,
+      }
     ],
   },
   {
