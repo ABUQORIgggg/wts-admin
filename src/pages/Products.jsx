@@ -171,8 +171,11 @@ const Products = () => {
     };
   
     fetchCategories();
+
+
+
+    
   }, []);
-  
   const handleDelete = async (id) => {
     try {
       const response = await fetch(`http://localhost:9000/api/v1/products/${id}`, {
