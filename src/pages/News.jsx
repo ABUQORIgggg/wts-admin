@@ -16,7 +16,7 @@ const News = () => {
 
   const dataRequest = async () => {
     try {
-      const response = await fetch('http://localhost:9000/api/v1/news/');
+      const response = await fetch('http://localhost:9000/api/v1/news');
       if (!response.ok) throw new Error('Ошибка сети');
       const news = await response.json();
       setData(news);

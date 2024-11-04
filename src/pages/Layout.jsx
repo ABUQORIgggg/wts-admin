@@ -5,6 +5,7 @@ const Layout = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
+    sectionTheme: 'lemarc1',
     images: [],
     imagePreviews: [],
     title: '',
@@ -59,6 +60,7 @@ const Layout = () => {
     }
 
     const formDataToSend = new FormData();
+    formDataToSend.append('sectionTheme', formData.sectionTheme);
     formDataToSend.append('title', formData.title);
     formDataToSend.append('description', formData.description);
     formDataToSend.append('layout_text_position', formData.layout_text_position);
@@ -68,19 +70,32 @@ const Layout = () => {
     try {
       const response = await fetch(
         isEditing ? `http://localhost:9000/api/v1/layout/${editingId}` : 'http://localhost:9000/api/v1/layout/create',
-        { method: isEditing ? 'PUT' : 'POST', body: formDataToSend }
+        {
+          method: isEditing ? 'PUT' : 'POST',
+          body: formDataToSend,
+        }
       );
+
       if (!response.ok) throw new Error('Failed to save layout');
       const result = await response.json();
 
-      setData(isEditing
-        ? data.map((layout) => (layout._id === editingId ? result.data : layout))
-        : [...data, result.data]
+      setData(
+        isEditing
+          ? data.map((layout) => (layout._id === editingId ? result.data : layout))
+          : [...data, result.data]
       );
       setIsEditing(false);
       setEditingId(null);
       document.getElementById('layout_modal').close();
-      setFormData({ images: [], imagePreviews: [], title: '', description: '', layout_text_position: 'left', layout_images_position: 'right' });
+      setFormData({
+        sectionTheme: 'lemarc1',
+        images: [],
+        imagePreviews: [],
+        title: '',
+        description: '',
+        layout_text_position: 'left',
+        layout_images_position: 'right',
+      });
     } catch (error) {
       console.error('Error saving layout:', error.message);
       alert(`Failed to save layout: ${error.message}`);
@@ -99,12 +114,13 @@ const Layout = () => {
 
   const handleEdit = (layout) => {
     setFormData({
-      title: layout.title,
-      description: layout.description,
+      sectionTheme: layout.sectionTheme[0],
+      title: layout.title[0],
+      description: layout.description[0],
       layout_text_position: layout.layout_text_position,
       layout_images_position: layout.layout_images_position,
-      images: [],
-      imagePreviews: layout.images.map((image) => `http://localhost:9000/${image}`),
+      images: [],  // New images will be added here on form submit
+      imagePreviews: layout.images.map((image) => `http://localhost:9000${image}`),
     });
     setIsEditing(true);
     setEditingId(layout._id);
@@ -114,12 +130,12 @@ const Layout = () => {
   return (
     <div className="p-5 flex flex-col gap-5 text-white">
       <div className="bg-base-200 p-5 flex justify-between items-center rounded-2xl shadow-lg">
-        <h1 className="text-3xl font-semibold  text-primary">Layouts</h1>
+        <h1 className="text-3xl font-semibold text-primary">Layouts</h1>
         <button
           className="btn btn-primary flex items-center py-2 px-4 rounded-lg shadow-md bg-blue-500 hover:bg-blue-600 text-white"
           onClick={() => {
             setIsEditing(false);
-            setFormData({ images: [], imagePreviews: [], title: '', description: '', layout_text_position: 'left', layout_images_position: 'right' });
+            setFormData({ sectionTheme: 'lemarc1', images: [], imagePreviews: [], title: '', description: '', layout_text_position: 'left', layout_images_position: 'right' });
             document.getElementById('layout_modal').showModal();
           }}
         >
@@ -136,6 +152,22 @@ const Layout = () => {
             {isEditing ? 'Edit Layout' : 'Add New Layout'}
           </h2>
           <form onSubmit={handleFormSubmit} className="space-y-4">
+            <div className="flex flex-col gap-2">
+              <label className="text-gray-600 font-medium">Section Theme</label>
+              <select
+                name="sectionTheme"
+                value={formData.sectionTheme}
+                onChange={handleFormChange}
+                className="select select-bordered p-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+              >
+                <option value="lemarc1">Lemarc1</option>
+                <option value="lemarc2">Lemarc2</option>
+                <option value="lemarc3">Lemarc3</option>
+                <option value="lemarc4">Lemarc4</option>
+                <option value="lemarc5">Lemarc5</option>
+                <option value="lemarc6">Lemarc6</option>
+              </select>
+            </div>
             <div className="flex flex-col gap-2">
               <label className="text-gray-600 font-medium">Title</label>
               <input
@@ -174,30 +206,6 @@ const Layout = () => {
                 ))}
               </div>
             </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-gray-600 font-medium">Text Position</label>
-              <select
-                name="layout_text_position"
-                value={formData.layout_text_position}
-                onChange={handleFormChange}
-                className="select select-bordered p-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-              >
-                <option value="left">Left</option>
-                <option value="right">Right</option>
-              </select>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-gray-600 font-medium">Images Position</label>
-              <select
-                name="layout_images_position"
-                value={formData.layout_images_position}
-                onChange={handleFormChange}
-                className="select select-bordered p-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-              >
-                <option value="left">Left</option>
-                <option value="right">Right</option>
-              </select>
-            </div>
             <button type="submit" className="btn btn-primary w-full py-2 rounded-lg shadow-md bg-blue-500 hover:bg-blue-600 text-white mt-4">
               {isEditing ? 'Save Changes' : 'Add Layout'}
             </button>
@@ -226,14 +234,14 @@ const Layout = () => {
                       {layout.images.map((image, index) => (
                         <img
                           key={index}
-                          src={`http://localhost:9000/${image}`}
+                          src={`http://localhost:9000${image}`}
                           alt="Layout"
                           className="w-16 h-16 object-cover rounded-md"
                         />
                       ))}
                     </td>
-                    <td>{layout.title}</td>
-                    <td>{layout.description.length > 50 ? layout.description.slice(0, 50) + '...' : layout.description}</td>
+                    <td>{layout.title[0]}</td>
+                    <td>{layout.description[0].length > 50 ? layout.description[0].slice(0, 50) + '...' : layout.description[0]}</td>
                     <td className="flex gap-2">
                       <button className="btn bg-gray-800 text-white py-1 px-2 rounded-md hover:bg-gray-700" onClick={() => handleEdit(layout)}>
                         <FaEdit className="mr-2" /> Edit

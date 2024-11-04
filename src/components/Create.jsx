@@ -49,8 +49,7 @@ const Create = () => {
       console.error('Error:', error);
       setError(error.message);
     }
-};
-
+  };
 
   return (
     <div className="flex flex-col items-center justify-center w-full text-white">
@@ -58,13 +57,13 @@ const Create = () => {
         onClick={openModal}
         className="btn btn-primary text-white"
       >
-        Create Partner
+        Создать партнера
       </button>
 
       {modalIsOpen && (
         <dialog open className="modal">
           <div className="modal-box">
-            <h2 className="text-xl font-bold mb-4">Create Partner</h2>
+            <h2 className="text-xl font-bold mb-4">Создать партнера</h2>
             {error && <p className="text-red-500 mb-4">{error}</p>}
             <div className="mb-4">
               <label className="block mb-2">Username:</label>

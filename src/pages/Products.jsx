@@ -118,43 +118,44 @@ const Products = () => {
 
     // Prepare form data
     Object.keys(formData).forEach((key) => {
-      if (key === 'images') {
-        formData.images.forEach((image) => {
-          formDataToSend.append('all_images', image);
-        });
-      } else if (key === 'pdf' && formData.pdf) {
-        formDataToSend.append('product_info_pdf', formData.pdf);
-      } else {
-        formDataToSend.append(key, formData[key]);
-      }
+        if (key === 'images') {
+            formData.images.forEach((image) => {
+                formDataToSend.append('images', image); // Adjusted field name to match backend
+            });
+        } else if (key === 'pdf' && formData.pdf) {
+            formDataToSend.append('product_info_pdf', formData.pdf); // Adjusted field name to match backend
+        } else {
+            formDataToSend.append(key, formData[key]);
+        }
     });
 
     try {
-      const url = isEditMode
-        ? `http://localhost:9000/api/v1/products/${editProductId}`
-        : "http://localhost:9000/api/v1/products/create";
-      const method = isEditMode ? 'PUT' : 'POST';
-      const response = await fetch(url, { method, body: formDataToSend });
+        const url = isEditMode
+            ? `http://localhost:9000/api/v1/products/${editProductId}`
+            : "http://localhost:9000/api/v1/products/create";
+        const method = isEditMode ? 'PUT' : 'POST';
+        const response = await fetch(url, { method, body: formDataToSend });
 
-      if (!response.ok) {
-        const errorText = await response.text();  // Capture full error message as text
-        throw new Error(`Error: ${errorText}`);
-      }
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Error: ${errorText}`);
+        }
 
-      const result = await response.json();
-      if (isEditMode) {
-        setData((prevData) => prevData.map((prod) => (prod._id === editProductId ? result.product : prod)));
-      } else {
-        setData((prevData) => [...prevData, result.product]);
-      }
+        const result = await response.json();
+        if (isEditMode) {
+            setData((prevData) => prevData.map((prod) => (prod._id === editProductId ? result.product : prod)));
+        } else {
+            setData((prevData) => [...prevData, result.product]);
+        }
 
-      closeModal('my_modal_3');
-      setFormData(initialFormData);
+        closeModal('my_modal_3');
+        setFormData(initialFormData);
     } catch (error) {
-      console.error('Error saving product:', error.message);
-      alert(`Error saving product: ${error.message}`);
+        console.error('Error saving product:', error.message);
+        alert(`Error saving product: ${error.message}`);
     }
 };
+
 
 
   useEffect(() => {
@@ -455,17 +456,18 @@ const Products = () => {
                 <tr key={product._id} className="w-full text-white">
                   <td>{product.name}</td>
                   <td>
-                    {product.image && Array.isArray(product.image.main_images) && product.image.main_images.length > 0 ? (
-                      <img
-                        src={`http://localhost:9000/${product.image.main_images[0]}`}
-                        alt={product.name}
-                        className="w-16 h-16 object-cover inline-block mr-2 cursor-pointer"
-                        onClick={() => openImageModal(`http://localhost:9000/${product.image.main_images[0]}`)}
-                      />
-                    ) : (
-                      <span>No Image Available</span>
-                    )}
-                  </td>
+    {product.images && product.images.length > 0 ? (
+        <img
+            src={`http://localhost:9000${product.images[0]}`}
+            alt={product.name}
+            className="w-16 h-16 object-cover inline-block mr-2 cursor-pointer"
+            onClick={() => openImageModal(`http://localhost:9000${product.images[0]}`)}
+        />
+    ) : (
+        <span>No Image Available</span>
+    )}
+</td>
+
                   <td>
                     {product.product_info_pdf ? (
                       <a href={`http://localhost:9000/${product.product_info_pdf}`} download>

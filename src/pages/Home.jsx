@@ -185,7 +185,7 @@ const Dashboard = () => {
                 <FaBox size={30} />
                 <div className="text-right">
                   <p className="text-3xl font-bold">{products.length}</p>
-                  <p className="text-sm">Total Products</p>
+                  <p className="text-sm">Всего продуктов</p>
                 </div>
               </div>
             </div>
@@ -198,7 +198,7 @@ const Dashboard = () => {
                 <FaLayerGroup size={30} />
                 <div className="text-right">
                   <p className="text-3xl font-bold">{layout.length}</p>
-                  <p className="text-sm">Total Layouts</p>
+                  <p className="text-sm">Всего макетов</p>
                 </div>
               </div>
             </div>
@@ -211,7 +211,8 @@ const Dashboard = () => {
                 <FaBullhorn size={30} />
                 <div className="text-right">
                   <p className="text-3xl font-bold">{advertising.length}</p>
-                  <p className="text-sm">Active Ads</p>
+                  <p className="text-sm">
+                  Активные объявления</p>
                 </div>
               </div>
             </div>
@@ -224,7 +225,8 @@ const Dashboard = () => {
                 <FaNewspaper size={30} />
                 <div className="text-right">
                   <p className="text-3xl font-bold">{news.length}</p>
-                  <p className="text-sm">Total News</p>
+                  <p className="text-sm">Всего новостей
+                  </p>
                 </div>
               </div>
             </div>
@@ -237,7 +239,7 @@ const Dashboard = () => {
                 <FaClipboardList size={30} />
                 <div className="text-right">
                   <p className="text-3xl font-bold">{categories.length}</p>
-                  <p className="text-sm">Total Categories</p>
+                  <p className="text-sm">Всего категорий</p>
                 </div>
               </div>
             </div>
@@ -250,7 +252,7 @@ const Dashboard = () => {
                 <FaClipboardCheck size={30} />
                 <div className="text-right">
                   <p className="text-3xl font-bold">{applications.length}</p>
-                  <p className="text-sm">Total Applications</p>
+                  <p className="text-sm">Всего заявок</p>
                 </div>
               </div>
             </div>
@@ -259,11 +261,11 @@ const Dashboard = () => {
           {/* Charts Section */}
           <div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="p-6 bg-white text-black rounded-lg shadow-md hover:shadow-lg transition-transform duration-300 transform hover:scale-105 flex flex-col items-center">
-              <h2 className="text-lg font-semibold mb-4">Data Distribution</h2>
+              <h2 className="text-lg font-semibold mb-4">Распределение данных</h2>
               <div className="relative w-[400px] h-[400px]">
                 <Doughnut data={doughnutData} options={doughnutOptions} />
                 <div className="absolute inset-0 flex flex-col justify-center items-center">
-                  <p className="text-xl font-bold">Total Items</p>
+                  <p className="text-xl font-bold">Всего предметов</p>
                   <p className="text-2xl">{totalItems}</p>
                 </div>
               </div>
@@ -271,7 +273,8 @@ const Dashboard = () => {
 
             {/* Applications Count Chart */}
             <div className="p-6 bg-white text-black rounded-lg shadow-md hover:shadow-lg transition-transform duration-300 transform hover:scale-105 flex flex-col items-center">
-              <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-transparent bg-clip-text">Applications Count</h2>
+              <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-transparent bg-clip-text">
+              Количество приложений</h2>
               <h1 className="text-4xl font-extrabold text-gray-800 mb-6">{applications.length}</h1>
               <div className="w-full">
                 <Bar data={applicationsBarData} options={barOptions} />
