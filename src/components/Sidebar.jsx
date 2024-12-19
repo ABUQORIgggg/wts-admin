@@ -90,6 +90,17 @@ const Sidebar = ({ theme }) => {
               <FaTags size={20} /> Категория
             </Link>
           </li>
+
+          <li>
+            <Link
+              to="/app/newsCategory"
+              className={`flex items-center gap-4 py-2 px-5 rounded-lg transition-all duration-300 ${
+                location.pathname === "/app/category" ? "bg-blue-600" : "hover:bg-blue-500"
+              }`}
+            >
+              <FaTags size={20} /> Новости Категория
+            </Link>
+          </li>
         </ul>
       </div>
     </div>

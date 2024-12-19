@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { FaEnvelope, FaPhone, FaTrash, FaSpinner } from 'react-icons/fa';
+import Loading from '../components/Loading';
 
 const Applications = ({ theme }) => {
     const [applications, setApplications] = useState([]); // State to store applications
@@ -43,7 +44,7 @@ const Applications = ({ theme }) => {
             <h2 className="text-4xl font-bold text-center mb-8">Список заявок</h2>
             {loading ? (
                 <div className="flex justify-center items-center">
-                    <FaSpinner className="animate-spin text-6xl" />
+                    <Loading />
                 </div>
             ) : (
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-6 ">

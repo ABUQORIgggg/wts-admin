@@ -17,6 +17,7 @@ import News from "./pages/News";
 import Advertising from "./pages/Advertising";
 import Layout from "./pages/Layout";
 import Category from "./pages/Category";
+import NewsCategory from "./pages/NewsCategory";
 
 const router = createBrowserRouter([
   {
@@ -68,6 +69,12 @@ const router = createBrowserRouter([
         path: "category", // Убираем слэш и приводим путь к нижнему регистру
         element: <PrivateRoute >
         <Category />
+        </PrivateRoute>,
+      },
+      {
+        path: "newsCategory", // Убираем слэш и приводим путь к нижнему регистру
+        element: <PrivateRoute >
+        <NewsCategory />
         </PrivateRoute>,
       }
     ],

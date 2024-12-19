@@ -5,6 +5,7 @@ import { Doughnut, Bar } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, TimeScale, CategoryScale, LinearScale, BarElement } from 'chart.js';
 import 'chartjs-adapter-date-fns';
 import axios from 'axios';
+import Loading from "../components/Loading";
 
 ChartJS.register(ArcElement, Tooltip, Legend, TimeScale, CategoryScale, LinearScale, BarElement);
 
@@ -15,6 +16,7 @@ const Dashboard = () => {
   const [news, setNews] = useState([]);
   const [categories, setCategories] = useState([]);
   const [applications, setApplications] = useState([]);
+  const [newsCategories, setNewsCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
@@ -26,6 +28,7 @@ const Dashboard = () => {
     requestNews();
     requestCategories();
     requestApplications();
+    requestNewsCategories();
   }, []);
 
   const requestProducts = async () => {
@@ -89,10 +92,20 @@ const Dashboard = () => {
     }
   };
 
-  const totalItems = products.length + advertising.length + layout.length + news.length + categories.length;
+  const requestNewsCategories = async () => {
+    try {
+      const response = await fetch('http://localhost:9000/api/v1/news-category');
+      const newsCategoryData = await response.json();
+      setNewsCategories(newsCategoryData || []);
+    } catch (error) {
+      console.error("Error fetching news categories: ", error);
+    }
+  };
+
+  const totalItems = products.length + advertising.length + layout.length + news.length + categories.length + newsCategories.length;
 
   const doughnutData = {
-    labels: ['Products', 'Advertising', 'Layouts', 'News', 'Categories'],
+    labels: ['Products', 'Advertising', 'Layouts', 'News', 'Categories', 'News Categories'],
     datasets: [
       {
         label: 'Distribution',
@@ -102,9 +115,10 @@ const Dashboard = () => {
           (layout.length / totalItems) * 100,
           (news.length / totalItems) * 100,
           (categories.length / totalItems) * 100,
+          (newsCategories.length / totalItems) * 100,
         ],
-        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#FFA500'],
-        hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#FFA500'],
+        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#FFA500', '#9370DB'],
+        hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#FFA500', '#9370DB'],
         borderWidth: 1,
         cutout: '75%',
       },
@@ -171,7 +185,7 @@ const Dashboard = () => {
     <div className="w-full h-full bg-gray-50 text-black p-6">
       {loading ? (
         <div className="flex justify-center items-center h-full">
-          <FaSpinner className="animate-spin text-3xl text-gray-500 w-[50px] h-[50px]" />
+          <Loading />
         </div>
       ) : (
         <>
@@ -211,8 +225,7 @@ const Dashboard = () => {
                 <FaBullhorn size={30} />
                 <div className="text-right">
                   <p className="text-3xl font-bold">{advertising.length}</p>
-                  <p className="text-sm">
-                  Активные объявления</p>
+                  <p className="text-sm">Активные объявления</p>
                 </div>
               </div>
             </div>
@@ -225,8 +238,7 @@ const Dashboard = () => {
                 <FaNewspaper size={30} />
                 <div className="text-right">
                   <p className="text-3xl font-bold">{news.length}</p>
-                  <p className="text-sm">Всего новостей
-                  </p>
+                  <p className="text-sm">Всего новостей</p>
                 </div>
               </div>
             </div>
@@ -256,6 +268,19 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
+
+            <div 
+              className="p-6 bg-gradient-to-r from-gray-500 to-gray-700 text-white rounded-lg shadow-md hover:shadow-lg transition-transform duration-300 transform hover:scale-105 cursor-pointer"
+              onClick={() => handleNavigate('/app/news-categories')}
+            >
+              <div className="flex justify-between items-center">
+                <FaNewspaper size={30} />
+                <div className="text-right">
+                  <p className="text-3xl font-bold">{newsCategories.length}</p>
+                  <p className="text-sm">Всего категорий новостей</p>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Charts Section */}
@@ -273,8 +298,7 @@ const Dashboard = () => {
 
             {/* Applications Count Chart */}
             <div className="p-6 bg-white text-black rounded-lg shadow-md hover:shadow-lg transition-transform duration-300 transform hover:scale-105 flex flex-col items-center">
-              <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-transparent bg-clip-text">
-              Количество приложений</h2>
+              <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-transparent bg-clip-text">Количество заявок</h2>
               <h1 className="text-4xl font-extrabold text-gray-800 mb-6">{applications.length}</h1>
               <div className="w-full">
                 <Bar data={applicationsBarData} options={barOptions} />

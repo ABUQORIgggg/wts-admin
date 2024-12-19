@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FaPlus, FaTrash, FaSpinner, FaBullhorn, FaEdit } from 'react-icons/fa';
+import Loading from '../components/Loading';
 
 const Advertising = () => {
     const [data, setData] = useState([]);
@@ -26,10 +27,13 @@ const Advertising = () => {
             setLoading(false);
         }
     };
+      
 
     useEffect(() => {
         dataRequest(); // Fetch data from API on mount
     }, []);
+
+    
 
     // Handle form input changes
     const handleFormChange = (e) => {
@@ -206,7 +210,7 @@ const Advertising = () => {
                     </table>
                     {loading && (
                         <div className="flex justify-center mt-5">
-                            <FaSpinner className="animate-spin text-5xl text-gray-50" />
+                            <Loading />
                         </div>
                     )}
                 </div>

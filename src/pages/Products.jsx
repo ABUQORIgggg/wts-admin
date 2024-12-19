@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaTrash, FaEdit } from 'react-icons/fa';
 import { FaSpinner } from 'react-icons/fa';
+import Loading from '../components/Loading';
 
 const Products = () => {
   const initialFormData = {
@@ -20,13 +21,13 @@ const Products = () => {
     imagePreviews: [],
     pdf: null,
   };
-
+  
+  const [categories, setCategories] = useState([]);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(null); 
   const [imageFields, setImageFields] = useState([0]); 
   const [mainImageIndex, setMainImageIndex] = useState(null);
-  const [categories, setCategories] = useState([]); // Categories state
   const [isEditMode, setIsEditMode] = useState(false);
   const [editProductId, setEditProductId] = useState(null);
   const [formData, setFormData] = useState(initialFormData);
@@ -118,16 +119,17 @@ const Products = () => {
 
     // Prepare form data
     Object.keys(formData).forEach((key) => {
-        if (key === 'images') {
-            formData.images.forEach((image) => {
-                formDataToSend.append('images', image); // Adjusted field name to match backend
-            });
-        } else if (key === 'pdf' && formData.pdf) {
-            formDataToSend.append('product_info_pdf', formData.pdf); // Adjusted field name to match backend
-        } else {
-            formDataToSend.append(key, formData[key]);
-        }
+      if (key === 'images') {
+        formData.images.forEach((image) => {
+          formDataToSend.append('images', image);
+        });
+      } else if (key === 'pdf' && formData.pdf) {
+        formDataToSend.append('product_info_pdf', formData.pdf);
+      } else {
+        formDataToSend.append(key, formData[key]); // Убедитесь, что сюда попадают category и description
+      }
     });
+    
 
     try {
         const url = isEditMode
@@ -161,14 +163,17 @@ const Products = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("http://localhost:9000/api/v1/categories");
-        if (!response.ok) throw new Error('Failed to fetch categories');
-        const categoriesData = await response.json();
-        setCategories(categoriesData);
+         const response = await fetch("http://localhost:9000/api/v1/categories");
+         if (!response.ok) throw new Error("Failed to fetch categories");
+   
+         const categoriesData = await response.json();
+         console.log("Fetched categories:", categoriesData);
+         setCategories(categoriesData.data || []);
       } catch (error) {
-        console.error('Error fetching categories:', error);
+         console.error("Error fetching categories:", error);
       }
-    };
+   };
+   
   
     fetchCategories();
 
@@ -209,7 +214,7 @@ const Products = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <FaSpinner className="animate-spin text-5xl text-gray-50" />
+        <Loading />
       </div>
     );
   }
@@ -249,19 +254,21 @@ const Products = () => {
               <label className="block">
                 <span className="text-gray-300">Категория</span>
                 <select
-                  name="category"
-                  value={formData.category}
-                  onChange={handleFormChange}
-                  className="select w-full mt-1 p-2 bg-gray-700 rounded-md text-white"
-                  required
-                >
-                  <option value="">Выберите категорию</option>
-                  {categories.map((category) => (
-                    <option key={category._id} value={category.category_name}>
-                      {category.category_name}
-                    </option>
-                  ))}
-                </select>
+  name="category"
+  value={formData.category}
+  onChange={handleFormChange}
+  className="input w-full mt-1 p-2 bg-gray-700 rounded-md text-white"
+>
+  <option value="">Выберите категорию</option>
+  {categories?.length > 0 &&
+    categories.map((category) => (
+      <option key={category.id} value={category.id}>
+        {category.name}
+      </option>
+    ))}
+</select>
+
+
               </label>
 
               <label className="block">
@@ -346,12 +353,13 @@ const Products = () => {
               <label className="block col-span-3">
                 <span className="text-gray-300">Описание</span>
                 <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleFormChange}
-                  className="textarea w-full mt-1 p-2 bg-gray-700 rounded-md text-white"
-                  required
-                ></textarea>
+  name="description"
+  value={formData.description}
+  onChange={handleFormChange}
+  className="textarea w-full mt-1 p-2 bg-gray-700 rounded-md text-white"
+  required
+></textarea>
+
               </label>
 
               <label className="block col-span-3">
@@ -455,32 +463,42 @@ const Products = () => {
               </tr>
             </thead>
             <tbody className="w-full break-normal break-words">
-              {data.map((product) => (
+            {data?.length > 0 &&
+  data.map((product) => (
                 <tr key={product._id} className="w-full text-white">
                   <td>{product.name}</td>
                   <td>
-    {product.images && product.images.length > 0 ? (
-        <img
-            src={`http://localhost:9000${product.images[0]}`}
-            alt={product.name}
-            className="w-16 h-16 object-cover inline-block mr-2 cursor-pointer"
-            onClick={() => openImageModal(`http://localhost:9000${product.images[0]}`)}
-        />
-    ) : (
-        <span>No Image Available</span>
-    )}
+  {product.images && product.images.length > 0 ? (
+    <img
+      src={`http://localhost:9000${product.images[0]}`}
+      alt={product.name}
+      className="w-16 h-16 object-cover inline-block mr-2 cursor-pointer"
+      onClick={() => openImageModal(`http://localhost:9000${product.images[0]}`)}
+    />
+  ) : (
+    <span>No Image Available</span>
+  )}
+</td>
+
+
+<td>
+  {product.product_info_pdf ? (
+    <a href={`http://localhost:9000/${product.product_info_pdf}`} download>
+      Скачать PDF
+    </a>
+  ) : (
+    <span>No PDF Available</span>
+  )}
 </td>
 
                   <td>
-                    {product.product_info_pdf ? (
-                      <a href={`http://localhost:9000/${product.product_info_pdf}`} download>
-                        Скачать PDF
-                      </a>
-                    ) : (
-                      <span>No PDF Available</span>
-                    )}
-                  </td>
-                  <td>{product.description.length > 30 ? `${product.description.substring(0, 30)}...` : product.description}</td>
+  {product.description
+    ? product.description.length > 30
+      ? `${product.description.substring(0, 30)}...`
+      : product.description
+    : "No description available"}
+</td>
+
                   <td>${product.price}</td>
                   <td>
                     <button

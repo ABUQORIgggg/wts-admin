@@ -6,9 +6,12 @@ const Create = () => {
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const openModal = () => {
     setModalIsOpen(true);
+    setError(''); // Clear previous errors
+    setSuccess(''); // Clear previous success messages
   };
 
   const closeModal = () => {
@@ -17,46 +20,46 @@ const Create = () => {
     setPassword('');
     setRole('');
     setError('');
+    setSuccess('');
   };
 
   const handleCreate = async () => {
     if (!username || !password || !role) {
-      setError('Please fill in all fields');
-      return;
+        setError('Please fill in all fields');
+        return;
     }
 
     const partnerData = { username, password, role };
 
     try {
-      const response = await fetch('http://localhost:9000/api/v1/auth/create-partnyor', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(partnerData),
-      });
+        const response = await fetch('http://localhost:9000/api/v1/auth/create-partnyor', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(partnerData),
+        });
 
-      const result = await response.json();
-      console.log('Response:', result);
+        const result = await response.json();
 
-      if (!response.ok) {
-        throw new Error(result.message || 'Error creating partner');
-      }
+        if (!response.ok) {
+            throw new Error(result.message || 'Error creating partner');
+        }
 
-      console.log('Partner created successfully:', result);
-      closeModal();
+        setSuccess('Partner created successfully!');
+        closeModal(); // Only close modal on success
     } catch (error) {
-      console.error('Error:', error);
-      setError(error.message);
+        if (error.message.includes('E11000')) {
+            setError('Username already exists'); // Display user-friendly message
+        } else {
+            setError(error.message);
+        }
     }
-  };
+};
 
   return (
     <div className="flex flex-col items-center justify-center w-full text-white">
-      <button
-        onClick={openModal}
-        className="btn btn-primary text-white"
-      >
+      <button onClick={openModal} className="btn btn-primary text-white">
         Создать партнера
       </button>
 
@@ -65,12 +68,16 @@ const Create = () => {
           <div className="modal-box">
             <h2 className="text-xl font-bold mb-4">Создать партнера</h2>
             {error && <p className="text-red-500 mb-4">{error}</p>}
+            {success && <p className="text-green-500 mb-4">{success}</p>}
             <div className="mb-4">
               <label className="block mb-2">Username:</label>
               <input
                 type="text"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  if (error) setError(''); // Clear error message on username change
+                }}
                 className="input input-bordered w-full"
                 required
               />
