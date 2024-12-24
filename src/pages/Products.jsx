@@ -1,32 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { FaTrash, FaEdit } from 'react-icons/fa';
-import { FaSpinner } from 'react-icons/fa';
-import Loading from '../components/Loading';
+import React, { useState, useEffect } from "react";
+import { FaTrash, FaEdit } from "react-icons/fa";
+import { FaSpinner } from "react-icons/fa";
+import Loading from "../components/Loading";
 
 const Products = () => {
   const initialFormData = {
-    name: '',
-    description: '',
-    price: '',
-    category: '',
-    stock: '',
-    rating: '',
-    volume: '',
-    discount_price: '',
+    name: "",
+    description: "",
+    price: "",
+    category: "asd",
+    stock: "",
+    rating: "",
+    volume: "",
+    discount_price: "",
     promotion: false,
-    ruler: '',
-    oils_type: '',
-    fidbek: '',
+    ruler: "",
+    oils_type: "",
+    fidbek: "",
     images: [],
     imagePreviews: [],
     pdf: null,
   };
-  
+
   const [categories, setCategories] = useState([]);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedImage, setSelectedImage] = useState(null); 
-  const [imageFields, setImageFields] = useState([0]); 
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imageFields, setImageFields] = useState([0]);
   const [mainImageIndex, setMainImageIndex] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editProductId, setEditProductId] = useState(null);
@@ -35,18 +35,18 @@ const Products = () => {
   const handleFormChange = (e, index = null) => {
     const { name, value, files, type } = e.target;
 
-    if (type === 'file') {
-      if (name === 'pdf') {
+    if (type === "file") {
+      if (name === "pdf") {
         setFormData((prevFormData) => ({
           ...prevFormData,
           pdf: files[0],
         }));
-      } else if (name === 'images') {
+      } else if (name === "images") {
         const updatedImages = [...formData.images];
-        updatedImages[index] = files[0]; 
+        updatedImages[index] = files[0];
 
         const updatedPreviews = [...formData.imagePreviews];
-        updatedPreviews[index] = URL.createObjectURL(files[0]); 
+        updatedPreviews[index] = URL.createObjectURL(files[0]);
 
         setFormData((prevFormData) => ({
           ...prevFormData,
@@ -64,14 +64,14 @@ const Products = () => {
 
   const addImageField = () => {
     if (formData.images.length >= 6) {
-      alert('Нельзя загрузить более 6 изображений.');
+      alert("Нельзя загрузить более 6 изображений.");
     } else {
       setImageFields((prevFields) => [...prevFields, prevFields.length]);
     }
   };
 
   const handleMainImageSelection = (index) => {
-    setMainImageIndex(index); 
+    setMainImageIndex(index);
   };
 
   const closeModal = (modalId) => {
@@ -83,7 +83,7 @@ const Products = () => {
 
   const openImageModal = (image) => {
     setSelectedImage(image);
-    document.getElementById('image_modal').showModal();
+    document.getElementById("image_modal").showModal();
   };
 
   const openProductModal = (product = null) => {
@@ -105,12 +105,11 @@ const Products = () => {
       setIsEditMode(false);
       setEditProductId(null);
     }
-    document.getElementById('my_modal_3').showModal();
+    document.getElementById("my_modal_3").showModal();
   };
-  
 
   const openImageUploadModal = () => {
-    document.getElementById('image_upload_modal').showModal();
+    document.getElementById("image_upload_modal").showModal();
   };
 
   const handleFormSubmit = async (e) => {
@@ -119,78 +118,78 @@ const Products = () => {
 
     // Prepare form data
     Object.keys(formData).forEach((key) => {
-      if (key === 'images') {
+      if (key === "images") {
         formData.images.forEach((image) => {
-          formDataToSend.append('images', image);
+          formDataToSend.append("images", image);
         });
-      } else if (key === 'pdf' && formData.pdf) {
-        formDataToSend.append('product_info_pdf', formData.pdf);
+      } else if (key === "pdf" && formData.pdf) {
+        formDataToSend.append("product_info_pdf", formData.pdf);
       } else {
         formDataToSend.append(key, formData[key]); // Убедитесь, что сюда попадают category и description
       }
     });
-    
 
     try {
-        const url = isEditMode
-            ? `http://localhost:9000/api/v1/products/${editProductId}`
-            : "http://localhost:9000/api/v1/products/create";
-        const method = isEditMode ? 'PUT' : 'POST';
-        const response = await fetch(url, { method, body: formDataToSend });
+      const url = isEditMode
+        ? `http://localhost:9000/api/v1/products/${editProductId}`
+        : "http://localhost:9000/api/v1/products/create";
+      const method = isEditMode ? "PUT" : "POST";
+      const response = await fetch(url, { method, body: formDataToSend });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Error: ${errorText}`);
-        }
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error: ${errorText}`);
+      }
 
-        const result = await response.json();
-        if (isEditMode) {
-            setData((prevData) => prevData.map((prod) => (prod._id === editProductId ? result.product : prod)));
-        } else {
-            setData((prevData) => [...prevData, result.product]);
-        }
+      const result = await response.json();
+      if (isEditMode) {
+        setData((prevData) =>
+          prevData.map((prod) =>
+            prod._id === editProductId ? result.product : prod
+          )
+        );
+      } else {
+        setData((prevData) => [...prevData, result.product]);
+      }
 
-        closeModal('my_modal_3');
-        setFormData(initialFormData);
+      closeModal("my_modal_3");
+      setFormData(initialFormData);
     } catch (error) {
-        console.error('Error saving product:', error.message);
-        alert(`Error saving product: ${error.message}`);
+      console.error("Error saving product:", error.message);
+      alert(`Error saving product: ${error.message}`);
     }
-};
-
-
+  };
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-         const response = await fetch("http://localhost:9000/api/v1/categories");
-         if (!response.ok) throw new Error("Failed to fetch categories");
-   
-         const categoriesData = await response.json();
-         console.log("Fetched categories:", categoriesData);
-         setCategories(categoriesData.data || []);
+        const response = await fetch("http://localhost:9000/api/v1/categories");
+        if (!response.ok) throw new Error("Failed to fetch categories");
+
+        const categoriesData = await response.json();
+        console.log("Fetched categories:", categoriesData);
+        setCategories(categoriesData || []);
       } catch (error) {
-         console.error("Error fetching categories:", error);
+        console.error("Error fetching categories:", error);
       }
-   };
-   
-  
+    };
+
     fetchCategories();
-
-
-
-    
   }, []);
+  console.log(categories)
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:9000/api/v1/products/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) throw new Error('Failed to delete product');
+      const response = await fetch(
+        `http://localhost:9000/api/v1/products/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      if (!response.ok) throw new Error("Failed to delete product");
 
       setData((prevData) => prevData.filter((product) => product._id !== id));
     } catch (error) {
-      console.error('Error deleting product:', error);
+      console.error("Error deleting product:", error);
     }
   };
 
@@ -198,11 +197,11 @@ const Products = () => {
     const fetchData = async () => {
       try {
         const response = await fetch("http://localhost:9000/api/v1/products");
-        if (!response.ok) throw new Error('Failed to fetch products');
+        if (!response.ok) throw new Error("Failed to fetch products");
         const products = await response.json();
         setData(products);
       } catch (error) {
-        console.error('Error fetching products:', error);
+        console.error("Error fetching products:", error);
       } finally {
         setLoading(false);
       }
@@ -232,7 +231,7 @@ const Products = () => {
         <div className="modal-box text-white relative bg-gray-800 rounded-lg p-8">
           <button
             className="absolute top-3 right-3 text-gray-400 hover:text-gray-100 transition"
-            onClick={() => closeModal('my_modal_3')}
+            onClick={() => closeModal("my_modal_3")}
           >
             ✕
           </button>
@@ -254,21 +253,19 @@ const Products = () => {
               <label className="block">
                 <span className="text-gray-300">Категория</span>
                 <select
-  name="category"
-  value={formData.category}
-  onChange={handleFormChange}
-  className="input w-full mt-1 p-2 bg-gray-700 rounded-md text-white"
->
-  <option value="">Выберите категорию</option>
-  {categories?.length > 0 &&
-    categories.map((category) => (
-      <option key={category.id} value={category.id}>
-        {category.name}
-      </option>
-    ))}
-</select>
-
-
+                  name="category"
+                  value={formData.category}
+                  onChange={handleFormChange}
+                  className="input w-full mt-1 p-2 bg-gray-700 rounded-md text-white"
+                >
+                  <option value="">Выберите категорию</option>
+                  {categories?.length > 0 &&
+                    categories.map((category) => (
+                      <option key={category._id} value={category.id}>
+                        {category.category_name}
+                      </option>
+                    ))}
+                </select>
               </label>
 
               <label className="block">
@@ -353,13 +350,12 @@ const Products = () => {
               <label className="block col-span-3">
                 <span className="text-gray-300">Описание</span>
                 <textarea
-  name="description"
-  value={formData.description}
-  onChange={handleFormChange}
-  className="textarea w-full mt-1 p-2 bg-gray-700 rounded-md text-white"
-  required
-></textarea>
-
+                  name="description"
+                  value={formData.description}
+                  onChange={handleFormChange}
+                  className="textarea w-full mt-1 p-2 bg-gray-700 rounded-md text-white"
+                  required
+                ></textarea>
               </label>
 
               <label className="block col-span-3">
@@ -393,7 +389,10 @@ const Products = () => {
                 Добавить изображения
               </button>
 
-              <button type="submit" className="btn bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg mt-4">
+              <button
+                type="submit"
+                className="btn bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg mt-4"
+              >
                 {isEditMode ? "Сохранить изменения" : "Добавить продукт"}
               </button>
             </div>
@@ -405,14 +404,16 @@ const Products = () => {
         <div className="modal-box text-white relative bg-gray-800 rounded-lg p-8">
           <button
             className="absolute top-3 right-3 text-gray-400 hover:text-gray-100 transition"
-            onClick={() => closeModal('image_upload_modal')}
+            onClick={() => closeModal("image_upload_modal")}
           >
             ✕
           </button>
 
           {imageFields.map((field, index) => (
             <div key={index} className="mb-4">
-              <label className="block text-gray-300">Изображение {index + 1}</label>
+              <label className="block text-gray-300">
+                Изображение {index + 1}
+              </label>
               <input
                 type="file"
                 name="images"
@@ -423,7 +424,11 @@ const Products = () => {
 
               {formData.imagePreviews[index] && (
                 <div className="flex items-center mt-2">
-                  <img src={formData.imagePreviews[index]} alt={`preview ${index}`} className="w-32 h-32 object-cover mr-4" />
+                  <img
+                    src={formData.imagePreviews[index]}
+                    alt={`preview ${index}`}
+                    className="w-32 h-32 object-cover mr-4"
+                  />
 
                   <label className="text-gray-300 flex items-center">
                     <input
@@ -463,59 +468,68 @@ const Products = () => {
               </tr>
             </thead>
             <tbody className="w-full break-normal break-words">
-            {data?.length > 0 &&
-  data.map((product) => (
-                <tr key={product._id} className="w-full text-white">
-                  <td>{product.name}</td>
-                  <td>
-  {product.images && product.images.length > 0 ? (
-    <img
-      src={`http://localhost:9000${product.images[0]}`}
-      alt={product.name}
-      className="w-16 h-16 object-cover inline-block mr-2 cursor-pointer"
-      onClick={() => openImageModal(`http://localhost:9000${product.images[0]}`)}
-    />
-  ) : (
-    <span>No Image Available</span>
-  )}
-</td>
+              {data?.length > 0 &&
+                data.map((product) => (
+                  <tr key={product._id} className="w-full text-white">
+                    <td>{product.name}</td>
+                    <td>
+                      {product.images && product.images.length > 0 ? (
+                        <img
+                          src={`http://localhost:9000${product.images[0]}`}
+                          alt={product.name}
+                          className="w-16 h-16 object-cover inline-block mr-2 cursor-pointer"
+                          onClick={() =>
+                            openImageModal(
+                              `http://localhost:9000${product.images[0]}`
+                            )
+                          }
+                        />
+                      ) : (
+                        <span>No Image Available</span>
+                      )}
+                    </td>
 
+                    <td>
+                      {product.product_info_pdf ? (
+                        <a
+                          href={`http://localhost:9000/${product.product_info_pdf}`}
+                          download
+                        >
+                          Скачать PDF
+                        </a>
+                      ) : (
+                        <span>No PDF Available</span>
+                      )}
+                    </td>
 
-<td>
-  {product.product_info_pdf ? (
-    <a href={`http://localhost:9000/${product.product_info_pdf}`} download>
-      Скачать PDF
-    </a>
-  ) : (
-    <span>No PDF Available</span>
-  )}
-</td>
+                    <td>
+                      {product.description
+                        ? product.description.length > 30
+                          ? `${product.description.substring(0, 30)}...`
+                          : product.description
+                        : "No description available"}
+                    </td>
 
-                  <td>
-  {product.description
-    ? product.description.length > 30
-      ? `${product.description.substring(0, 30)}...`
-      : product.description
-    : "No description available"}
-</td>
-
-                  <td>${product.price}</td>
-                  <td>
-                    <button
-                      className="btn bg-slate-800 hover:bg-yellow-600 transition duration-200 mr-2"
-                      onClick={() => openProductModal(product)}
-                    >
-                      <FaEdit /> редактировать
-                    </button>
-                    <button
-                      className="btn bg-red-500 hover:bg-red-600 transition duration-200"
-                      onClick={() => handleDelete(product._id)}
-                    >
-                      <FaTrash /> удалить
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                    <td>${product.price}</td>
+                    <td id={product._id}>
+                      <button
+                        className="btn bg-slate-800 hover:bg-yellow-600 transition duration-200 mr-2"
+                        onClick={() => {
+                          openProductModal(product);
+                          setEditProductId(product._id);
+                        }}
+                      >
+                        <FaEdit /> редактировать
+                      </button>
+                      <button
+                        className="btn bg-red-500 hover:bg-red-600 transition duration-200"
+                        onClick={() => handleDelete(product._id)}
+                      >
+                        <FaTrash /> удалить
+                      </button>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
@@ -525,11 +539,17 @@ const Products = () => {
         <div className="modal-box relative bg-gray-800 rounded-lg p-8 text-center">
           <button
             className="absolute top-3 right-3 text-gray-400 hover:text-gray-100 transition"
-            onClick={() => closeModal('image_modal')}
+            onClick={() => closeModal("image_modal")}
           >
             ✕
           </button>
-          {selectedImage && <img src={selectedImage} alt="Selected" className="w-full h-auto object-contain" />}
+          {selectedImage && (
+            <img
+              src={selectedImage}
+              alt="Selected"
+              className="w-full h-auto object-contain"
+            />
+          )}
         </div>
       </dialog>
     </div>
