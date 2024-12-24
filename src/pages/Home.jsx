@@ -182,7 +182,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="w-full h-full bg-gray-50 text-black p-6">
+    <div className="w-full h-full text-black p-6">
       {loading ? (
         <div className="flex justify-center items-center h-full">
           <Loading />
