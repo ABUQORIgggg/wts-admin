@@ -116,64 +116,77 @@ const Products = () => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     const formDataToSend = new FormData();
-
-    // Prepare form data
-    Object.keys(formData).forEach((key) => {
-      if (key === 'images') {
-        formData.images.forEach((image) => {
-          formDataToSend.append('images', image);
-        });
-      } else if (key === 'pdf' && formData.pdf) {
-        formDataToSend.append('product_info_pdf', formData.pdf);
-      } else {
-        formDataToSend.append(key, formData[key]); // Убедитесь, что сюда попадают category и description
+  
+    // Подготовка данных для отправки
+    if (formData.images.length === 0) {
+      alert("Добавьте хотя бы одно изображение.");
+      return;
+    }
+  
+    if (mainImageIndex === null) {
+      alert("Выберите главное изображение.");
+      return;
+    }
+  
+    // Добавляем главное изображение
+    formDataToSend.append('image.main_images', formData.images[mainImageIndex]);
+  
+    // Добавляем все изображения
+    formData.images.forEach((image, index) => {
+      if (index !== mainImageIndex) {
+        formDataToSend.append('image.all_images', image);
       }
     });
-    
-
+  
+    Object.keys(formData).forEach((key) => {
+      if (key !== 'images' && key !== 'imagePreviews' && key !== 'pdf') {
+        formDataToSend.append(key, formData[key]);
+      } else if (key === 'pdf' && formData.pdf) {
+        formDataToSend.append('product_info_pdf', formData.pdf);
+      }
+    });
+  
     try {
-        const url = isEditMode
-            ? `http://localhost:9000/api/v1/products/${editProductId}`
-            : "http://localhost:9000/api/v1/products/create";
-        const method = isEditMode ? 'PUT' : 'POST';
-        const response = await fetch(url, { method, body: formDataToSend });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Error: ${errorText}`);
-        }
-
-        const result = await response.json();
-        if (isEditMode) {
-            setData((prevData) => prevData.map((prod) => (prod._id === editProductId ? result.product : prod)));
-        } else {
-            setData((prevData) => [...prevData, result.product]);
-        }
-
-        closeModal('my_modal_3');
-        setFormData(initialFormData);
+      const url = isEditMode
+        ? `http://localhost:9000/api/v1/products/${editProductId}`
+        : 'http://localhost:9000/api/v1/products/create';
+      const method = isEditMode ? 'PUT' : 'POST';
+      const response = await fetch(url, { method, body: formDataToSend });
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error: ${errorText}`);
+      }
+  
+      const result = await response.json();
+      if (isEditMode) {
+        setData((prevData) =>
+          prevData.map((prod) => (prod._id === editProductId ? result.product : prod))
+        );
+      } else {
+        setData((prevData) => [...prevData, result.product]);
+      }
+  
+      closeModal('my_modal_3');
+      setFormData(initialFormData);
     } catch (error) {
-        console.error('Error saving product:', error.message);
-        alert(`Error saving product: ${error.message}`);
+      console.error('Error saving product:', error.message);
+      alert(`Error saving product: ${error.message}`);
     }
-};
-
-
+  };
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-         const response = await fetch("http://localhost:9000/api/v1/categories");
-         if (!response.ok) throw new Error("Failed to fetch categories");
-   
-         const categoriesData = await response.json();
-         console.log("Fetched categories:", categoriesData);
-         setCategories(categoriesData.data || []);
+        const response = await fetch("http://localhost:9000/api/v1/categories");
+        if (!response.ok) throw new Error("Failed to fetch categories");
+    
+        const categoriesData = await response.json();
+        setCategories(categoriesData.data || []); // Убедитесь, что структура соответствует
       } catch (error) {
-         console.error("Error fetching categories:", error);
+        console.error("Error fetching categories:", error);
       }
-   };
-   
+    };
   
     fetchCategories();
 
@@ -263,14 +276,11 @@ const Products = () => {
   {categories?.length > 0 &&
     categories.map((category) => (
       <option key={category.id} value={category.id}>
-        {category.name}
+        {category.category_name}
       </option>
     ))}
 </select>
-
-
               </label>
-
               <label className="block">
                 <span className="text-gray-300">Цена продукта</span>
                 <input
@@ -284,7 +294,6 @@ const Products = () => {
                   step="0.01"
                 />
               </label>
-
               <label className="block">
                 <span className="text-gray-300">Запас</span>
                 <input
@@ -297,7 +306,6 @@ const Products = () => {
                   min="0"
                 />
               </label>
-
               <label className="block">
                 <span className="text-gray-300">Цена со скидкой</span>
                 <input
@@ -310,7 +318,6 @@ const Products = () => {
                   step="0.01"
                 />
               </label>
-
               <label className="block">
                 <span className="text-gray-300">Рейтинг</span>
                 <input
@@ -325,7 +332,6 @@ const Products = () => {
                   step="0.1"
                 />
               </label>
-
               <label className="block">
                 <span className="text-gray-300">Объем</span>
                 <input
@@ -337,7 +343,6 @@ const Products = () => {
                   required
                 />
               </label>
-
               <label className="block">
                 <span className="text-gray-300">Правитель</span>
                 <input
@@ -349,7 +354,6 @@ const Products = () => {
                   required
                 />
               </label>
-
               <label className="block col-span-3">
                 <span className="text-gray-300">Описание</span>
                 <textarea
@@ -359,9 +363,7 @@ const Products = () => {
   className="textarea w-full mt-1 p-2 bg-gray-700 rounded-md text-white"
   required
 ></textarea>
-
               </label>
-
               <label className="block col-span-3">
                 <span className="text-gray-300">Тип масла</span>
                 <input
@@ -372,7 +374,6 @@ const Products = () => {
                   className="input w-full mt-1 p-2 bg-gray-700 rounded-md text-white"
                 />
               </label>
-
               <label className="block col-span-3">
                 <span className="text-gray-300">PDF файла продукта</span>
                 <input
