@@ -478,7 +478,6 @@ const Products = () => {
                         <span>No Image Available</span>
                       )}
                     </td>
-
                     <td>
                       {product.product_info_pdf ? (
                         <a

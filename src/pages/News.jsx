@@ -261,7 +261,7 @@ const News = () => {
                     <td>
   {newsItem.images && newsItem.images.length > 0 ? (
     <img
-      src={`http://localhost:9000${newsItem.images[0]}`}
+      src={`http://localhost:9000/${newsItem.images[0]}`}
       alt="News"
       className="w-16 h-16 object-cover"
     />
@@ -269,6 +269,8 @@ const News = () => {
     'No Image'
   )}
 </td>
+
+
                     <td>{new Date(newsItem.date).toLocaleDateString()}</td>
 
                     <td>{newsItem.news_type ? newsItem.news_type.category_name : 'N/A'}</td> {/* Display category name */}

@@ -45,7 +45,7 @@ function App() {
       <Navbar toggleTheme={toggleTheme} theme={theme} />
       <div className="flex">
         <Sidebar theme={theme} /> {/* Передаем theme в Sidebar */}
-        <div className="flex-grow">
+        <div className="flex-grow max-h-[100vh] overflow-y-auto">
           <Routes>
             <Route path="/" element={<Home />} />
           </Routes>
