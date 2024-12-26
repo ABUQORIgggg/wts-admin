@@ -11,7 +11,7 @@ const Applications = ({ theme }) => {
     useEffect(() => {
         const fetchApplications = async () => {
             try {
-                const response = await axios.get('http://localhost:9000/api/v1/applications');
+                const response = await axios.get('https://bakend-wtc-4.onrender.com/api/v1/applications');
                 setApplications(response.data || []);
                 // Save fetched applications to localStorage
                 localStorage.setItem('applications', JSON.stringify(response.data || []));
@@ -32,7 +32,7 @@ const Applications = ({ theme }) => {
     // Handle delete request
     const handleDelete = async (id) => {
         try {
-            await axios.delete(`http://localhost:9000/api/v1/applications/delete/${id}`);
+            await axios.delete(`https://bakend-wtc-4.onrender.com/api/v1/applications/delete/${id}`);
             setApplications((prev) => prev.filter((app) => app._id !== id));
         } catch (error) {
             console.error('Error deleting application:', error);

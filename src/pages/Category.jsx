@@ -13,7 +13,7 @@ const Category = () => {
   // Fetch categories
   const fetchCategories = async () => {
     try {
-      const response = await fetch('http://localhost:9000/api/v1/categories');
+      const response = await fetch('https://bakend-wtc-4.onrender.com/api/v1/categories');
       const categories = await response.json();
       setData(categories);
     } catch (error) {
@@ -43,7 +43,7 @@ const Category = () => {
 
       if (isEditing && editingId) {
         // Update category
-        response = await fetch(`http://localhost:9000/api/v1/categories/${editingId}`, {
+        response = await fetch(`https://bakend-wtc-4.onrender.com/api/v1/categories/${editingId}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData),
@@ -55,7 +55,7 @@ const Category = () => {
         }
       } else {
         // Create new category
-        response = await fetch('http://localhost:9000/api/v1/categories', {
+        response = await fetch('https://bakend-wtc-4.onrender.com/api/v1/categories', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData),
@@ -81,7 +81,7 @@ const Category = () => {
   // Handle delete category
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:9000/api/v1/categories/${id}`, {
+      const response = await fetch(`https://bakend-wtc-4.onrender.com/v1/categories/${id}`, {
         method: 'DELETE',
       });
       if (response.ok) {

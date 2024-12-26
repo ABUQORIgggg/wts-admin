@@ -21,7 +21,7 @@ const News = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:9000/api/v1/news');
+        const response = await fetch('https://bakend-wtc-4.onrender.com/v1/news');
         if (!response.ok) throw new Error('Network error');
         const news = await response.json();
         setData(news);
@@ -34,7 +34,7 @@ const News = () => {
 
     const fetchNewsTypes = async () => {
       try {
-        const response = await fetch('http://localhost:9000/api/v1/news-category');
+        const response = await fetch('https://bakend-wtc-4.onrender.com/v1/news-category');
         if (!response.ok) throw new Error('Network error');
         const types = await response.json();
         setNewsTypes(types);
@@ -83,8 +83,8 @@ const News = () => {
       formData.images.forEach((file) => form.append('images', file));
   
       const url = isEditing
-        ? `http://localhost:9000/api/v1/news/${editingId}`
-        : 'http://localhost:9000/api/v1/news/create';
+        ? `https://bakend-wtc-4.onrender.com/api/v1/news/${editingId}`
+        : 'https://bakend-wtc-4.onrender.com/v1/news/create';
       const method = isEditing ? 'PATCH' : 'POST';
   
       const response = await fetch(url, {
@@ -99,7 +99,7 @@ const News = () => {
       }
   
       await response.json();
-      setData(await (await fetch('http://localhost:9000/api/v1/news')).json());
+      setData(await (await fetch('https://bakend-wtc-4.onrender.com/v1/news')).json());
   
       document.getElementById('my_modal_news').close();
       setFormData({ title: '', descriptions: '', date: '', news_type: '', images: [] });
@@ -116,7 +116,7 @@ const News = () => {
 
   const handleDelete = async (id) => {
     try {
-        const response = await fetch(`http://localhost:9000/api/v1/news/${id}`, { method: 'DELETE' });
+        const response = await fetch(`https://bakend-wtc-4.onrender.com/api/v1/news/${id}`, { method: 'DELETE' });
         if (response.ok) {
             setData((prevData) => prevData.filter((news) => news._id !== id));
             alert('News successfully deleted');
@@ -261,7 +261,7 @@ const News = () => {
                     <td>
   {newsItem.images && newsItem.images.length > 0 ? (
     <img
-      src={`http://localhost:9000/${newsItem.images[0]}`}
+      src={`https://bakend-wtc-4.onrender.com/${newsItem.images[0]}`}
       alt="News"
       className="w-16 h-16 object-cover"
     />

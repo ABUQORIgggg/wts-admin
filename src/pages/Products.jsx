@@ -93,9 +93,9 @@ const Products = () => {
         ...product,
         images: Array.isArray(product.image) ? product.image : [product.image],
         imagePreviews: Array.isArray(product.image)
-          ? product.image.map((img) => `http://localhost:9000/${img}`)
+          ? product.image.map((img) => `https://bakend-wtc-4.onrender.com/${img}`)
           : product.image
-          ? [`http://localhost:9000/${product.image}`]
+          ? [`https://bakend-wtc-4.onrender.com/${product.image}`]
           : [],
       });
       setIsEditMode(true);
@@ -131,8 +131,8 @@ const Products = () => {
 
     try {
       const url = isEditMode
-        ? `http://localhost:9000/api/v1/products/${editProductId}`
-        : "http://localhost:9000/api/v1/products/create";
+        ? `https://bakend-wtc-4.onrender.com/${editProductId}`
+        : "https://bakend-wtc-4.onrender.com/v1/products/create";
       const method = isEditMode ? "PUT" : "POST";
       const response = await fetch(url, { method, body: formDataToSend });
 
@@ -163,7 +163,7 @@ const Products = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("http://localhost:9000/api/v1/categories");
+        const response = await fetch("https://bakend-wtc-4.onrender.com/api/v1/categories");
         if (!response.ok) throw new Error("Failed to fetch categories");
 
         const categoriesData = await response.json();
@@ -179,7 +179,7 @@ const Products = () => {
   const handleDelete = async (id) => {
     try {
       const response = await fetch(
-        `http://localhost:9000/api/v1/products/${id}`,
+        `https://bakend-wtc-4.onrender.com/api/v1/products/${id}`,
         {
           method: "DELETE",
         }
@@ -195,7 +195,7 @@ const Products = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:9000/api/v1/products");
+        const response = await fetch("https://bakend-wtc-4.onrender.com/api/v1/products");
         if (!response.ok) throw new Error("Failed to fetch products");
         const products = await response.json();
         setData(products);
@@ -465,12 +465,12 @@ const Products = () => {
                     <td>
                       {product.images && product.images.length > 0 ? (
                         <img
-                          src={`http://localhost:9000${product.images[0]}`}
+                          src={`https://bakend-wtc-4.onrender.com/${product.images[0]}`}
                           alt={product.name}
                           className="w-16 h-16 object-cover inline-block mr-2 cursor-pointer"
                           onClick={() =>
                             openImageModal(
-                              `http://localhost:9000${product.images[0]}`
+                              `https://bakend-wtc-4.onrender.com/${product.images[0]}`
                             )
                           }
                         />
@@ -481,7 +481,7 @@ const Products = () => {
                     <td>
                       {product.product_info_pdf ? (
                         <a
-                          href={`http://localhost:9000/${product.product_info_pdf}`}
+                          href={`https://bakend-wtc-4.onrender.com//${product.product_info_pdf}`}
                           download
                         >
                           Скачать PDF

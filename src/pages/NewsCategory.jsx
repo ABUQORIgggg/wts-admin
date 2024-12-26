@@ -14,7 +14,7 @@ const NewsCategory = () => {
 
   const fetchNewsCategories = async () => {
     try {
-      const response = await fetch('http://localhost:9000/api/v1/news-category');
+      const response = await fetch('https://bakend-wtc-4.onrender.com/api/v1/news-category');
       const categories = await response.json();
       setData(categories);
     } catch (error) {
@@ -39,13 +39,13 @@ const NewsCategory = () => {
     try {
       let response;
       if (isEditing && editingId) {
-        response = await fetch(`http://localhost:9000/api/v1/news-category/update/${editingId}`, {
+        response = await fetch(`https://bakend-wtc-4.onrender.com/api/v1/news-category/update/${editingId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData),
         });
       } else {
-        response = await fetch('http://localhost:9000/api/v1/news-category/create', {
+        response = await fetch('https://bakend-wtc-4.onrender.com/api/v1/news-category/create', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
@@ -78,7 +78,7 @@ const NewsCategory = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:9000/api/v1/news-category/delete/${id}`, {
+      const response = await fetch(`https://bakend-wtc-4.onrender.com/api/v1/news-category/delete/${id}`, {
         method: 'DELETE',
       });
       if (response.ok) {
