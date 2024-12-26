@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { login } from '../redux/authSclice';
 import { FaUser, FaLock } from 'react-icons/fa';
 import { Rings } from 'react-loader-spinner';
 
@@ -10,12 +8,12 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [user, setUser] = useState(null); // useState for user management
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
-  const handleLogin = async () => {
-    if (!username || !password) {
+  const handleLogin = async (providedUsername = username, providedPassword = password) => {
+    if (!providedUsername || !providedPassword) {
       setError('Please fill in all fields');
       return;
     }
@@ -26,12 +24,12 @@ const Login = () => {
     try {
       const response = await axios.post(
         `https://bakend-wtc-4.onrender.com/api/v1/auth/login`,
-        { username, password }
+        { username: providedUsername, password: providedPassword }
       );
 
       if (response.data.user) {
         localStorage.setItem('admin', JSON.stringify(response.data.user));
-        dispatch(login(response.data.user));
+        setUser(response.data.user); // Set user in state
         navigate('/app/home');
       } else {
         setError('Invalid username or password');
@@ -42,6 +40,14 @@ const Login = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleTestLogin = () => {
+    const testUsername = 'admin';
+    const testPassword = 'admin';
+    setUsername(testUsername);
+    setPassword(testPassword);
+    handleLogin(testUsername, testPassword);
   };
 
   return (
@@ -64,7 +70,7 @@ const Login = () => {
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Enter username"
             autoComplete="username"
-            className="border rounded-full p-4 pl-12 w-full text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border rounded-full p-4 pl-12 w-full text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
             aria-label="Username"
           />
@@ -78,7 +84,7 @@ const Login = () => {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter password"
             autoComplete="current-password"
-            className="border rounded-full p-4 pl-12 w-full text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border rounded-full p-4 pl-12 w-full text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
             aria-label="Password"
           />
@@ -86,10 +92,17 @@ const Login = () => {
 
         <button
           className={`bg-blue-600 hover:bg-blue-700 transition duration-300 text-white font-semibold py-4 px-6 rounded-full w-full shadow-lg ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-          onClick={handleLogin}
+          onClick={() => handleLogin()}
           disabled={loading}
         >
           {loading ? 'Loading...' : 'Login'}
+        </button>
+
+        <button
+          className="mt-4 bg-gray-600 hover:bg-gray-700 transition duration-300 text-white font-semibold py-4 px-6 rounded-full w-full shadow-lg"
+          onClick={handleTestLogin}
+        >
+          Test Login as Admin
         </button>
       </div>
     </div>

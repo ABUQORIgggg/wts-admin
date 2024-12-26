@@ -23,59 +23,54 @@ const router = createBrowserRouter([
   {
     path: "/app",
     element: 
-    <PrivateRoute >
       <App />
-    </PrivateRoute>
     ,
     children: [
       {
         path: "home", 
         element: 
-        <PrivateRoute >
         <Home />
-        </PrivateRoute>,
+        
       },
       {
         path: "products", 
-        element: <PrivateRoute >
+        element: 
         <Products />
-        </PrivateRoute>,
+       
       },
       {
         path: "applications", // Убираем слэш
-        element: <PrivateRoute >
+        element: 
         <Applications />
-        </PrivateRoute>,
       },
       {
         path: "news", // Убираем слэш
-        element: <PrivateRoute >
+        element: 
         <News />
-        </PrivateRoute>,
+        
       },
       {
         path: "advertising", // Убираем слэш и приводим путь к нижнему регистру
-        element: <PrivateRoute >
+        element: 
         <Advertising />
-        </PrivateRoute>,
+        
       },
       {
         path: "layout", // Убираем слэш и приводим путь к нижнему регистру
-        element: <PrivateRoute >
+        element: 
         <Layout />
-        </PrivateRoute>,
+      
       },
       {
         path: "category", // Убираем слэш и приводим путь к нижнему регистру
-        element: <PrivateRoute >
+        element: 
         <Category />
-        </PrivateRoute>,
       },
       {
         path: "newsCategory", // Убираем слэш и приводим путь к нижнему регистру
-        element: <PrivateRoute >
+        element:
         <NewsCategory />
-        </PrivateRoute>,
+      
       }
     ],
   },
@@ -98,4 +93,3 @@ root.render(
   </Provider>
 );
 
-reportWebVitals();
