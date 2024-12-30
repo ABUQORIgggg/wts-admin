@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaSpinner, FaPlus, FaEdit, FaTrash } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
 import { IoMdPaper } from 'react-icons/io';
 import Loading from '../components/Loading';
 
@@ -9,14 +9,19 @@ const Category = () => {
   const [formData, setFormData] = useState({ category_name: '' });
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [errorMessage, setErrorMessage] = useState('');
 
   // Fetch categories
   const fetchCategories = async () => {
+    setLoading(true);
+    setErrorMessage('');
     try {
-      const response = await fetch('https://bakend-wtc-4.onrender.com/api/v1/categories');
+      const response = await fetch('https://bakend-wtc.onrender.com/api/v1/categories');
+      if (!response.ok) throw new Error('Failed to fetch categories');
       const categories = await response.json();
       setData(categories);
     } catch (error) {
+      setErrorMessage(error.message);
       console.error('Error fetching categories:', error);
     } finally {
       setLoading(false);
@@ -27,52 +32,45 @@ const Category = () => {
     fetchCategories();
   }, []);
 
-  // Handle form change
+  // Handle form changes
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  // Handle form submit (Create or Edit)
+  // Handle form submission (Create or Edit)
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage('');
     try {
-      let response;
-      let updatedCategory;
+      const response = isEditing
+        ? await fetch(`https://bakend-wtc.onrender.com/api/v1/categories/${editingId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData),
+          })
+        : await fetch('https://bakend-wtc.onrender.com/api/v1/categories/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData),
+          });
 
-      if (isEditing && editingId) {
-        // Update category
-        response = await fetch(`https://bakend-wtc-4.onrender.com/api/v1/categories/${editingId}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
-        });
+      if (!response.ok) throw new Error('Failed to save category');
+      const updatedCategory = await response.json();
 
-        updatedCategory = await response.json();
-        if (response.ok) {
-          setData(data.map((cat) => (cat._id === editingId ? updatedCategory : cat)));
-        }
+      if (isEditing) {
+        setData((prevData) =>
+          prevData.map((cat) => (cat._id === editingId ? updatedCategory : cat))
+        );
       } else {
-        // Create new category
-        response = await fetch('https://bakend-wtc-4.onrender.com/api/v1/categories', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
-        });
-
-        updatedCategory = await response.json();
-        if (response.ok) {
-          setData([...data, updatedCategory]);
-        }
+        setData((prevData) => [...prevData, updatedCategory]);
       }
 
-      document.getElementById('my_modal_category').close();
-      setFormData({ category_name: '' });
-      setIsEditing(false);
-      setEditingId(null);
+      closeModal();
     } catch (error) {
-      console.error('Error adding/updating category:', error);
+      setErrorMessage(error.message);
+      console.error('Error saving category:', error);
     } finally {
       setLoading(false);
     }
@@ -80,18 +78,20 @@ const Category = () => {
 
   // Handle delete category
   const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this category?')) return;
+    setLoading(true);
+    setErrorMessage('');
     try {
-      const response = await fetch(`https://bakend-wtc-4.onrender.com/v1/categories/${id}`, {
+      const response = await fetch(`https://bakend-wtc.onrender.com/api/v1/categories/${id}`, {
         method: 'DELETE',
       });
-      if (response.ok) {
-        setData(data.filter((category) => category._id !== id));
-        alert('Category deleted successfully');
-      } else {
-        console.error('Error deleting category');
-      }
+      if (!response.ok) throw new Error('Failed to delete category');
+      setData((prevData) => prevData.filter((category) => category._id !== id));
     } catch (error) {
+      setErrorMessage(error.message);
       console.error('Error deleting category:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -101,6 +101,13 @@ const Category = () => {
     setEditingId(category._id);
     setIsEditing(true);
     document.getElementById('my_modal_category').showModal();
+  };
+
+  const closeModal = () => {
+    document.getElementById('my_modal_category').close();
+    setFormData({ category_name: '' });
+    setIsEditing(false);
+    setEditingId(null);
   };
 
   return (
@@ -121,11 +128,20 @@ const Category = () => {
         </button>
       </div>
 
+      {errorMessage && (
+        <div className="alert alert-error text-white">
+          {errorMessage}
+        </div>
+      )}
+
       <dialog id="my_modal_category" className="modal">
         <div className="modal-box">
-          <form method="dialog">
-            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">X</button>
-          </form>
+          <button
+            className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            onClick={closeModal}
+          >
+            X
+          </button>
           <form onSubmit={handleFormSubmit}>
             <label className="input input-bordered flex items-center gap-2 mt-10">
               Category Name
@@ -139,7 +155,9 @@ const Category = () => {
                 required
               />
             </label>
-            <button type="submit" className="btn mt-5">{isEditing ? 'Edit Category' : 'Add Category'}</button>
+            <button type="submit" className="btn mt-5">
+              {isEditing ? 'Edit Category' : 'Add Category'}
+            </button>
           </form>
         </div>
       </dialog>
@@ -167,10 +185,16 @@ const Category = () => {
                     <td>{category._id}</td>
                     <td>{category.category_name}</td>
                     <td className="flex gap-2">
-                      <button className="btn btn-sm bg-slate-800 text-white flex items-center" onClick={() => handleEdit(category)}>
+                      <button
+                        className="btn btn-sm bg-slate-800 text-white flex items-center"
+                        onClick={() => handleEdit(category)}
+                      >
                         <FaEdit className="mr-2" /> Edit
                       </button>
-                      <button className="btn btn-sm bg-red-500 text-white flex items-center" onClick={() => handleDelete(category._id)}>
+                      <button
+                        className="btn btn-sm bg-red-500 text-white flex items-center"
+                        onClick={() => handleDelete(category._id)}
+                      >
                         <FaTrash className="mr-2" /> Delete
                       </button>
                     </td>
@@ -178,7 +202,9 @@ const Category = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="3" className="text-center">No categories available</td>
+                  <td colSpan="3" className="text-center">
+                    No categories available
+                  </td>
                 </tr>
               )}
             </tbody>

@@ -11,9 +11,9 @@ const News = () => {
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
-    description: '',
-    date: '',
-    type: '',
+    descriptions: '',
+    data: '',
+    news_type: '',
     images: [],
   });
 
@@ -21,7 +21,7 @@ const News = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('https://bakend-wtc.onrender.com/api/v1/layout/about');
+        const response = await fetch('https://bakend-wtc.onrender.com/api/v1/news');
         if (!response.ok) throw new Error('Network error');
         const news = await response.json();
         setData(news);
@@ -34,10 +34,18 @@ const News = () => {
 
     const fetchNewsTypes = async () => {
       try {
-        const response = await fetch('https://bakend-wtc.onrender.com/api/v1/layout-type');
+        const response = await fetch('https://bakend-wtc.onrender.com/api/v1/news-news_type');
         if (!response.ok) throw new Error('Network error');
-        const types = await response.json();
-        setNewsTypes(types);
+        const news_types = await response.json();
+        setNewsTypes(news_types);
+
+        // Устанавливаем первое значение news_type в форме, если список не пуст
+        if (news_types.length > 0) {
+          setFormData((prev) => ({
+            ...prev,
+            news_type: news_types[0]._id,
+          }));
+        }
       } catch (error) {
         console.error('Error loading news types:', error);
       }
@@ -67,7 +75,7 @@ const News = () => {
     e.preventDefault();
     setLoading(true);
 
-    if (!formData.title || !formData.description || !formData.date || !formData.type) {
+    if (!formData.title || !formData.descriptions || !formData.data || !formData.news_type) {
       alert('All fields are required.');
       setLoading(false);
       return;
@@ -76,14 +84,14 @@ const News = () => {
     try {
       const form = new FormData();
       form.append('title', formData.title);
-      form.append('description', formData.description);
-      form.append('date', formData.date);
-      form.append('type', formData.type);
+      form.append('descriptions', formData.descriptions);
+      form.append('data', formData.data);
+      form.append('news_type', formData.news_type);
       formData.images.forEach((file) => form.append('images', file));
 
       const url = isEditing
-        ? `https://bakend-wtc.onrender.com/api/v1/layout/about/${editingId}`
-        : 'https://bakend-wtc.onrender.com/api/v1/layout/about-create';
+        ? `https://bakend-wtc.onrender.com/api/v1/news/${editingId}`
+        : 'https://bakend-wtc.onrender.com/api/v1/news/create';
       const method = isEditing ? 'PATCH' : 'POST';
 
       const response = await fetch(url, {
@@ -97,10 +105,10 @@ const News = () => {
       }
 
       await response.json();
-      setData(await (await fetch('https://bakend-wtc.onrender.com/api/v1/layout/about')).json());
+      setData(await (await fetch('https://bakend-wtc.onrender.com/api/v1/news')).json());
 
       document.getElementById('my_modal_news').close();
-      setFormData({ title: '', description: '', date: '', type: '', images: [] });
+      setFormData({ title: '', descriptions: '', data: '', news_type: newsTypes[0]?._id || '', images: [] });
       setIsEditing(false);
       setEditingId(null);
     } catch (error) {
@@ -113,7 +121,7 @@ const News = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`https://bakend-wtc.onrender.com/api/v1/layout/about/${id}`, { method: 'DELETE' });
+      const response = await fetch(`https://bakend-wtc.onrender.com/api/v1/news/${id}`, { method: 'DELETE' });
       if (response.ok) {
         setData((prevData) => prevData.filter((news) => news._id !== id));
         alert('News successfully deleted');
@@ -132,9 +140,9 @@ const News = () => {
     setEditingId(newsItem._id);
     setFormData({
       title: newsItem.title,
-      description: newsItem.description,
-      date: newsItem.date,
-      type: newsItem.type ? newsItem.type._id : '',
+      descriptions: newsItem.descriptions,
+      data: newsItem.data,
+      news_type: newsItem.news_type ? newsItem.news_type._id : '',
       images: [],
     });
     document.getElementById('my_modal_news').showModal();
@@ -150,7 +158,7 @@ const News = () => {
           className="btn btn-primary"
           onClick={() => {
             setIsEditing(false);
-            setFormData({ title: '', description: '', date: '', type: '', images: [] });
+            setFormData({ title: '', descriptions: '', data: '', news_type: newsTypes[0]?._id || '', images: [] });
             document.getElementById('my_modal_news').showModal();
           }}
         >
@@ -160,7 +168,12 @@ const News = () => {
 
       <dialog id="my_modal_news" className="modal">
         <div className="modal-box">
-          <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={() => document.getElementById('my_modal_news').close()}>X</button>
+          <button
+            className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            onClick={() => document.getElementById('my_modal_news').close()}
+          >
+            X
+          </button>
           <form onSubmit={handleFormSubmit} className="space-y-5">
             <label className="flex flex-col gap-2">
               <span>Title</span>
@@ -175,20 +188,14 @@ const News = () => {
             </label>
             <label className="flex flex-col gap-2">
               <span>News Type</span>
-              <select
-                name="type"
-                value={formData.type}
+              <input
+                type="text"
+                name="news_type"
+                value={formData.news_type}
                 onChange={handleFormChange}
                 className="input input-bordered w-full"
                 required
-              >
-                <option value="" disabled>Select news type</option>
-                {newsTypes.map((type) => (
-                  <option key={type._id} value={type._id}>
-                    {type.category_name}
-                  </option>
-                ))}
-              </select>
+              />
             </label>
             <label className="flex flex-col gap-2">
               <span>Images</span>
@@ -204,8 +211,8 @@ const News = () => {
               <span>Date</span>
               <input
                 type="date"
-                name="date"
-                value={formData.date}
+                name="data"
+                value={formData.data}
                 onChange={handleFormChange}
                 className="input input-bordered w-full"
                 required
@@ -214,8 +221,8 @@ const News = () => {
             <label className="flex flex-col gap-2">
               <span>Description</span>
               <textarea
-                name="description"
-                value={formData.description}
+                name="descriptions"
+                value={formData.descriptions}
                 onChange={handleFormChange}
                 className="textarea w-full"
                 rows="3"
@@ -262,12 +269,16 @@ const News = () => {
                         'No Image'
                       )}
                     </td>
-                    <td>{new Date(newsItem.date).toLocaleDateString()}</td>
-                    <td>{newsItem.type ? newsItem.type.category_name : 'N/A'}</td>
-                    <td className="max-w-xs truncate">{newsItem.description}</td>
+                    <td>{new Date(newsItem.data).toLocaleDateString()}</td>
+                    <td>{newsItem.news_type ? newsItem.news_type.category_name : 'N/A'}</td>
+                    <td className="max-w-xs truncate">{newsItem.descriptions}</td>
                     <td>
-                      <button className="btn bg-slate-800" onClick={() => handleEdit(newsItem)}>Edit</button>
-                      <button className="btn bg-red-700" onClick={() => handleDelete(newsItem._id)}>Delete</button>
+                      <button className="btn bg-slate-800" onClick={() => handleEdit(newsItem)}>
+                        Edit
+                      </button>
+                      <button className="btn bg-red-700" onClick={() => handleDelete(newsItem._id)}>
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 ))}

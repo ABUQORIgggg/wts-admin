@@ -14,7 +14,7 @@ const NewsCategory = () => {
 
   const fetchNewsCategories = async () => {
     try {
-      const response = await fetch('https://bakend-wtc-4.onrender.com/api/v1/layout-type');
+      const response = await fetch('https://bakend-wtc.onrender.com/api/v1/news-type');
       if (!response.ok) {
         throw new Error('Failed to fetch news categories');
       }
@@ -42,13 +42,13 @@ const NewsCategory = () => {
     try {
       let response;
       if (isEditing && editingId) {
-        response = await fetch(`https://bakend-wtc-4.onrender.com/api/v1/layout-type/about-type/${editingId}`, {
+        response = await fetch(`https://bakend-wtc.onrender.com/api/v1/news-type/${editingId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData),
         });
       } else {
-        response = await fetch('https://bakend-wtc-4.onrender.com/api/v1/layout-type/create', {
+        response = await fetch('https://bakend-wtc.onrender.com/api/v1/news-type/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData),
@@ -79,7 +79,7 @@ const NewsCategory = () => {
   const handleDelete = async (id) => {
     setLoading(true);
     try {
-      const response = await fetch(`https://bakend-wtc-4.onrender.com/api/v1/layout-type/about-type/${id}`, {
+      const response = await fetch(`https://bakend-wtc.onrender.com/api/v1/news-type/${id}`, {
         method: 'DELETE',
       });
       if (response.ok) {

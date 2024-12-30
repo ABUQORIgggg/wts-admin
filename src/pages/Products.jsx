@@ -134,10 +134,10 @@ const Products = () => {
         },
         imagePreviews: Array.isArray(product.image)
           ? product.image.map(
-              (img) => `https://admin-dash-oil-trade.onrender.com/${img}`
+              (img) => `https://bakend-wtc.onrender.com/${img}`
             )
           : product.image
-          ? [`https://admin-dash-oil-trade.onrender.com/${product.image}`]
+          ? [`https://bakend-wtc.onrender.com/${product.image}`]
           : [],
       });
       setIsEditMode(true);
@@ -179,8 +179,8 @@ const Products = () => {
 
     try {
       const url = isEditMode
-        ? `https://admin-dash-oil-trade.onrender.com/api/v1/card/${editProductId}`
-        : "https://admin-dash-oil-trade.onrender.com/api/v1/card/create";
+        ? `https://bakend-wtc.onrender.com/api/v1/products/${editProductId}`
+        : "https://bakend-wtc.onrender.com/api/v1/products/create";
       const method = isEditMode ? "PUT" : "POST";
       const response = await fetch(url, { method, body: formDataToSend });
 
@@ -212,7 +212,7 @@ const Products = () => {
     const fetchCategories = async () => {
       try {
         const response = await fetch(
-          "https://admin-dash-oil-trade.onrender.com/api/v1/category"
+          "https://bakend-wtc.onrender.com/api/v1/categories"
         );
         if (!response.ok) throw new Error("Failed to fetch categories");
 
@@ -228,7 +228,7 @@ const Products = () => {
   const handleDelete = async (id) => {
     try {
       const response = await fetch(
-        `https://admin-dash-oil-trade.onrender.com/api/v1/card/${id}`,
+        `https://bakend-wtc.onrender.com/api/v1/products/${id}`,
         {
           method: "DELETE",
         }
@@ -245,7 +245,7 @@ const Products = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          "https://admin-dash-oil-trade.onrender.com/api/v1/card"
+          "https://bakend-wtc.onrender.com/api/v1/products"
         );
         if (!response.ok) throw new Error("Failed to fetch card");
         const card = await response.json();
@@ -518,24 +518,24 @@ const Products = () => {
                       {product.image.main_images &&
                       product.image.main_images.length > 0 ? (
                         <img
-                          src={`https://admin-dash-oil-trade.onrender.com\\${product.image.main_images[0]}`}
+                          src={`https://bakend-wtc.onrender.com\\${product.image.main_images[0]}`}
                           alt={product.name}
                           className="w-16 h-16 object-cover inline-block mr-2 cursor-pointer"
                           onClick={() =>
                             openImageModal(
-                              `https://admin-dash-oil-trade.onrender.com\\${product.image.main_images[0]}`
+                              `https://bakend-wtc.onrender.com\\${product.image.main_images[0]}`
                             )
                           }
                         />
                       ) : product.image.all_images &&
                         product.image.all_images.length > 0 ? (
                         <img
-                          src={`https://admin-dash-oil-trade.onrender.com\\${product.image.all_images[0]}`}
+                          src={`https://bakend-wtc.onrender.com\\${product.image.all_images[0]}`}
                           alt={product.name}
                           className="w-16 h-16 object-cover inline-block mr-2 cursor-pointer"
                           onClick={() =>
                             openImageModal(
-                              `https://admin-dash-oil-trade.onrender.com\\${product.image.all_images[0]}`
+                              `https://bakend-wtc.onrender.com\\${product.image.all_images[0]}`
                             )
                           }
                         />
@@ -546,7 +546,7 @@ const Products = () => {
                     <td>
                       {product.product_info_pdf ? (
                         <a
-                          href={`http://localhost:9000/${product.product_info_pdf}`}
+                          href={`https://bakend-wtc.onrender.com/${product.product_info_pdf}`}
                           download
                         >
                           Скачать PDF
