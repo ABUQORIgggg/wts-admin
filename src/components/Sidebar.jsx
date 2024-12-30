@@ -38,16 +38,6 @@ const Sidebar = ({ theme }) => {
           </li>
           <li>
             <Link
-              to="/app/applications"
-              className={`flex items-center gap-4 py-2 px-5 rounded-lg transition-all duration-300 ${
-                location.pathname === "/app/applications" ? "bg-blue-600" : "hover:bg-blue-500"
-              }`}
-            >
-              <FaClipboardList size={20} /> Заявки
-            </Link>
-          </li>
-          <li>
-            <Link
               to="/app/news"
               className={`flex items-center gap-4 py-2 px-5 rounded-lg transition-all duration-300 ${
                 location.pathname === "/app/news" ? "bg-blue-600" : "hover:bg-blue-500"
@@ -67,17 +57,6 @@ const Sidebar = ({ theme }) => {
             </Link>
           </li>
 
-          {/* Изменяем иконку для Layout */}
-          <li>
-            <Link
-              to="/app/layout"
-              className={`flex items-center gap-4 py-2 px-5 rounded-lg transition-all duration-300 ${
-                location.pathname === "/app/layout" ? "bg-blue-600" : "hover:bg-blue-500"
-              }`}
-            >
-              <FaLayerGroup size={20} /> Макет
-            </Link>
-          </li>
 
           {/* Иконка для Category */}
           <li>

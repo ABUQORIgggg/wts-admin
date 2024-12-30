@@ -7,14 +7,17 @@ const NewsCategory = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
-    category_name: '',
+    type: '',
   });
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
   const fetchNewsCategories = async () => {
     try {
-      const response = await fetch('https://bakend-wtc-4.onrender.com/api/v1/news-category');
+      const response = await fetch('https://bakend-wtc-4.onrender.com/api/v1/layout-type');
+      if (!response.ok) {
+        throw new Error('Failed to fetch news categories');
+      }
       const categories = await response.json();
       setData(categories);
     } catch (error) {
@@ -39,19 +42,17 @@ const NewsCategory = () => {
     try {
       let response;
       if (isEditing && editingId) {
-        response = await fetch(`https://bakend-wtc-4.onrender.com/api/v1/news-category/update/${editingId}`, {
+        response = await fetch(`https://bakend-wtc-4.onrender.com/api/v1/layout-type/about-type/${editingId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData),
         });
       } else {
-        response = await fetch('https://bakend-wtc-4.onrender.com/api/v1/news-category/create', {
+        response = await fetch('https://bakend-wtc-4.onrender.com/api/v1/layout-type/create', {
           method: 'POST',
-          headers: {
-              'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ category_name: 'Sample Category' })
-      });      
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
       }
 
       if (response.ok) {
@@ -63,9 +64,8 @@ const NewsCategory = () => {
         } else {
           setData([...data, updatedCategory]);
         }
-
         document.getElementById('my_modal_news_category').close();
-        setFormData({ category_name: '' });
+        setFormData({ type: '' });
       } else {
         console.error('Error adding/updating news category');
       }
@@ -77,8 +77,9 @@ const NewsCategory = () => {
   };
 
   const handleDelete = async (id) => {
+    setLoading(true);
     try {
-      const response = await fetch(`https://bakend-wtc-4.onrender.com/api/v1/news-category/delete/${id}`, {
+      const response = await fetch(`https://bakend-wtc-4.onrender.com/api/v1/layout-type/about-type/${id}`, {
         method: 'DELETE',
       });
       if (response.ok) {
@@ -89,18 +90,20 @@ const NewsCategory = () => {
       }
     } catch (error) {
       console.error('Error deleting news category:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleEdit = (category) => {
-    setFormData({ category_name: category.category_name });
+    setFormData({ type: category.type });
     setEditingId(category._id);
     setIsEditing(true);
     document.getElementById('my_modal_news_category').showModal();
   };
 
   return (
-    <div className="p-5 flex flex-col w-10/15 gap-5 text-white">
+    <div className="p-5 flex flex-col w-full gap-5 text-white">
       <div className="bg-base-200 p-5 w-full flex justify-between items-center rounded-2xl">
         <h1 className="text-3xl font-bold text-primary flex gap-2">
           <IoMdPaper className="size-9" /> News Categories
@@ -109,7 +112,7 @@ const NewsCategory = () => {
           className="btn btn-primary flex items-center"
           onClick={() => {
             setIsEditing(false);
-            setFormData({ category_name: '' });
+            setFormData({ type: '' });
             document.getElementById('my_modal_news_category').showModal();
           }}
         >
@@ -130,8 +133,8 @@ const NewsCategory = () => {
               Category Name
               <input
                 type="text"
-                name="category_name"
-                value={formData.category_name}
+                name="type"
+                value={formData.type}
                 onChange={handleFormChange}
                 className="grow"
                 placeholder="News Category Name"
@@ -166,7 +169,7 @@ const NewsCategory = () => {
                 data.map((category) => (
                   <tr key={category._id}>
                     <td>{category._id}</td>
-                    <td>{category.category_name}</td>
+                    <td>{category.type}</td>
                     <td className="flex gap-2">
                       <button
                         className="btn btn-sm bg-slate-800 text-white flex items-center"
