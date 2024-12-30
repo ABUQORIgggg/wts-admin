@@ -21,7 +21,7 @@ const Layout = () => {
   const fetchLayouts = async () => {
     setLoading(true);
     try {
-      const response = await fetch('https://bakend-wtc-4.onrender.com/api/layouts');
+      const response = await fetch('https://bakend-wtc.onrender.com/api/layouts');
       if (!response.ok) throw new Error('Failed to fetch layouts from API');
       const result = await response.json();
       setData(result);
@@ -81,7 +81,7 @@ const Layout = () => {
   
     try {
       const response = await fetch(
-        isEditing ? `https://bakend-wtc-4.onrender.com/api/layouts/${editingId}` : 'https://bakend-wtc-4.onrender.com//layouts/create',
+        isEditing ? `https://bakend-wtc.onrender.com/api/layouts/${editingId}` : 'https://bakend-wtc.onrender.com/layouts/create',
         {
           method: isEditing ? 'PUT' : 'POST',
           body: formDataToSend,
@@ -122,7 +122,7 @@ const Layout = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`https://bakend-wtc-4.onrender.com/layouts/${id}`, { method: 'DELETE' });
+      const response = await fetch(`https://bakend-wtc.onrender.com/layouts/${id}`, { method: 'DELETE' });
       if (!response.ok) throw new Error('Failed to delete layout');
       setData(data.filter((layout) => layout._id !== id));
     } catch (error) {
@@ -139,7 +139,7 @@ const Layout = () => {
       "3_text": layout["3_text"],
       "4_text": layout["4_text"],
       bg_image: null,
-      imagePreview: `https://bakend-wtc-4.onrender.com/${layout.bg_images}`,
+      imagePreview: `https://bakend-wtc.onrender.com/${layout.bg_images}`,
     });
     setIsEditing(true);
     setEditingId(layout._id);
@@ -253,7 +253,7 @@ const Layout = () => {
                   <tr key={layout._id}>
                     <td>{layout._id}</td>
                     <td>
-                      <img src={`https://bakend-wtc-4.onrender.com/${layout.bg_images}`} alt="Layout" className="w-16 h-16 object-cover rounded-md" />
+                      <img src={`https://bakend-wtc.onrender.com/${layout.bg_images}`} alt="Layout" className="w-16 h-16 object-cover rounded-md" />
                     </td>
                     <td>{layout.title}</td>
                     <td>{layout.descriptions.length > 50 ? layout.descriptions.slice(0, 50) + '...' : layout.descriptions}</td>

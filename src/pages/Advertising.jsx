@@ -17,7 +17,7 @@ const Advertising = () => {
     const dataRequest = async () => {
         setLoading(true);
         try {
-            const response = await fetch('https://bakend-wtc-4.onrender.com/api/v1/banners');
+            const response = await fetch('https://bakend-wtc.onrender.com/api/v1/banners');
             if (!response.ok) throw new Error('Failed to fetch banners from API');
             const ads = await response.json();
             setData(ads.data || []);
@@ -67,13 +67,13 @@ const Advertising = () => {
             let response;
             if (isEditing && editingId) {
                 // PUT request for updating an existing banner
-                response = await fetch(`https://bakend-wtc-4.onrender.com/api/v1/banners/${editingId}`, {
+                response = await fetch(`https://bakend-wtc.onrender.com/api/v1/banners/${editingId}`, {
                     method: 'PUT',
                     body: formDataToSend,
                 });
             } else {
                 // POST request for adding a new banner
-                response = await fetch('https://bakend-wtc-4.onrender.com/api/v1/banners/create', {
+                response = await fetch('https://bakend-wtc.onrender.com/api/v1/banners/create', {
                     method: 'POST',
                     body: formDataToSend,
                 });
@@ -104,7 +104,7 @@ const Advertising = () => {
     // Handle deletion of a banner
     const handleDelete = async (id) => {
         try {
-            const response = await fetch(`https://bakend-wtc-4.onrender.com/api/v1/banners/${id}`, {
+            const response = await fetch(`https://bakend-wtc.onrender.com/api/v1/banners/${id}`, {
                 method: 'DELETE',
             });
             if (!response.ok) {
@@ -186,7 +186,7 @@ const Advertising = () => {
                                         <td>{ad._id}</td>
                                         <td>
                                             {ad.images.map((image, index) => (
-                                                <img key={index} src={`https://bakend-wtc-4.onrender.com/${image}`} alt="Ad" style={{ width: '100px', height: 'auto', marginRight: '5px' }} />
+                                                <img key={index} src={`https://bakend-wtc.onrender.com/${image}`} alt="Ad" style={{ width: '100px', height: 'auto', marginRight: '5px' }} />
                                             ))}
                                         </td>
                                         <td>{ad.title}</td>

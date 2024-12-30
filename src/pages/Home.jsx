@@ -33,7 +33,7 @@ const Dashboard = () => {
 
   const requestProducts = async () => {
     try {
-      const response = await fetch("https://bakend-wtc-4.onrender.com/api/v1/products");
+      const response = await fetch("https://bakend-wtc.onrender.com/api/v1/card");
       const data = await response.json();
       setProducts(data || []);
     } catch (e) {
@@ -43,7 +43,7 @@ const Dashboard = () => {
 
   const requestAdvertising = async () => {
     try {
-      const response = await fetch("https://bakend-wtc-4.onrender.com/api/v1/banners");
+      const response = await fetch("https://bakend-wtc.onrender.com/api/v1/banners");
       const ads = await response.json();
       setAdvertising(ads.data || []);
     } catch (e) {
@@ -53,7 +53,7 @@ const Dashboard = () => {
 
   const requestLayout = async () => {
     try {
-      const response = await fetch("https://bakend-wtc-4.onrender.com/api/v1/layout");
+      const response = await fetch("https://bakend-wtc.onrender.com/api/v1/layout");
       const layoutData = await response.json();
       setLayout(layoutData.data || []);
     } catch (e) {
@@ -63,7 +63,7 @@ const Dashboard = () => {
 
   const requestNews = async () => {
     try {
-      const response = await fetch("https://bakend-wtc-4.onrender.com/api/v1/news");
+      const response = await fetch("https://bakend-wtc.onrender.com/api/v1/news");
       const newsData = await response.json();
       setNews(newsData || []);
     } catch (e) {
@@ -75,7 +75,7 @@ const Dashboard = () => {
 
   const requestCategories = async () => {
     try {
-      const response = await fetch('https://bakend-wtc-4.onrender.com/api/v1/categories');
+      const response = await fetch('https://bakend-wtc.onrender.com/api/v1/categories');
       const categoryData = await response.json();
       setCategories(categoryData || []);
     } catch (error) {
@@ -85,7 +85,7 @@ const Dashboard = () => {
 
   const requestApplications = async () => {
     try {
-      const response = await axios.get('https://bakend-wtc-4.onrender.com/api/v1/applications');
+      const response = await axios.get('https://bakend-wtc.onrender.com/api/v1/applications');
       setApplications(response.data || []);
     } catch (error) {
       console.error("Error fetching applications: ", error);
@@ -94,7 +94,7 @@ const Dashboard = () => {
 
   const requestNewsCategories = async () => {
     try {
-      const response = await fetch('https://bakend-wtc-4.onrender.com//api/v1/news-category');
+      const response = await fetch('https://bakend-wtc.onrender.com/api/v1/news');
       const newsCategoryData = await response.json();
       setNewsCategories(newsCategoryData || []);
     } catch (error) {

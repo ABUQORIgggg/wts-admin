@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { FaTrash, FaEdit } from "react-icons/fa";
-import { FaSpinner } from "react-icons/fa";
-import Loading from "../components/Loading";
+import {
+  FaTrash,
+  FaEdit
+} from "react-icons/fa";
+
+import LoadingComponent from "../components/Loading";
 
 const Products = () => {
   const initialFormData = {
@@ -17,7 +20,10 @@ const Products = () => {
     ruler: "",
     oils_type: "",
     fidbek: "",
-    images: [],
+    image: {
+      main_images: [],
+      all_images: [],
+    },
     imagePreviews: [],
     pdf: null,
   };
@@ -42,7 +48,7 @@ const Products = () => {
           pdf: files[0],
         }));
       } else if (name === "images") {
-        const updatedImages = [...formData.images];
+        const updatedImages = [...formData.image.all_images];
         updatedImages[index] = files[0];
 
         const updatedPreviews = [...formData.imagePreviews];
@@ -50,7 +56,9 @@ const Products = () => {
 
         setFormData((prevFormData) => ({
           ...prevFormData,
-          images: updatedImages,
+          image: {
+            all_images: updatedImages,
+          },
           imagePreviews: updatedPreviews,
         }));
       }
@@ -63,15 +71,40 @@ const Products = () => {
   };
 
   const addImageField = () => {
-    if (formData.images.length >= 6) {
+    if (formData.image.all_images.length >= 6) {
       alert("Нельзя загрузить более 6 изображений.");
     } else {
       setImageFields((prevFields) => [...prevFields, prevFields.length]);
     }
   };
 
-  const handleMainImageSelection = (index) => {
-    setMainImageIndex(index);
+  const handleMainImageSelection = (e, index) => {
+    const isChecked = e.target.checked;
+
+    setFormData((prevFormData) => {
+      let updatedMainImages;
+      if (isChecked) {
+        updatedMainImages = [formData.image.all_images[index]];
+      } else {
+        updatedMainImages = [formData.image.all_images[0]];
+      }
+
+      console.log(updatedMainImages);
+
+      return {
+        ...prevFormData,
+        image: {
+          ...prevFormData.image,
+          main_images: updatedMainImages,
+        },
+      };
+    });
+
+    if (isChecked) {
+      setMainImageIndex(index);
+    } else if (mainImageIndex === index) {
+      setMainImageIndex(null);
+    }
   };
 
   const closeModal = (modalId) => {
@@ -91,11 +124,20 @@ const Products = () => {
       setFormData({
         ...initialFormData,
         ...product,
-        images: Array.isArray(product.image) ? product.image : [product.image],
+        image: {
+          all_images: Array.isArray(product.image.all_images)
+            ? product.image.all_images
+            : [product.image.all_images],
+          main_images: Array.isArray(product.image.main_images)
+            ? product.image.main_images
+            : [product.image.main_images],
+        },
         imagePreviews: Array.isArray(product.image)
-          ? product.image.map((img) => `https://bakend-wtc-4.onrender.com/${img}`)
+          ? product.image.map(
+              (img) => `https://bakend-wtc.onrender.com/${img}`
+            )
           : product.image
-          ? [`https://bakend-wtc-4.onrender.com/${product.image}`]
+          ? [`https://bakend-wtc.onrender.com/${product.image}`]
           : [],
       });
       setIsEditMode(true);
@@ -116,23 +158,29 @@ const Products = () => {
     e.preventDefault();
     const formDataToSend = new FormData();
 
-    // Prepare form data
     Object.keys(formData).forEach((key) => {
-      if (key === "images") {
-        formData.images.forEach((image) => {
-          formDataToSend.append("images", image);
-        });
+      if (key === "image") {
+        if (formData.image?.main_images?.length > 0) {
+          formData.image.main_images.forEach((file) => {
+            formDataToSend.append("main_images", file);
+          });
+        }
+        if (formData.image?.all_images?.length > 0) {
+          formData.image.all_images.forEach((file) => {
+            formDataToSend.append("all_images", file);
+          });
+        }
       } else if (key === "pdf" && formData.pdf) {
         formDataToSend.append("product_info_pdf", formData.pdf);
-      } else {
-        formDataToSend.append(key, formData[key]); // Убедитесь, что сюда попадают category и description
+      } else if (key !== "imagePreviews") {
+        formDataToSend.append(key, formData[key]);
       }
     });
 
     try {
       const url = isEditMode
-        ? `https://bakend-wtc-4.onrender.com/${editProductId}`
-        : "https://bakend-wtc-4.onrender.com/v1/products/create";
+        ? `https://bakend-wtc.onrender.com/api/v1/products/${editProductId}`
+        : "https://bakend-wtc.onrender.com/api/v1/products/create";
       const method = isEditMode ? "PUT" : "POST";
       const response = await fetch(url, { method, body: formDataToSend });
 
@@ -155,7 +203,7 @@ const Products = () => {
       closeModal("my_modal_3");
       setFormData(initialFormData);
     } catch (error) {
-      console.error("Error saving product:", error.message);
+      console.error("Error saving product:", error);
       alert(`Error saving product: ${error.message}`);
     }
   };
@@ -163,11 +211,12 @@ const Products = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("https://bakend-wtc-4.onrender.com/api/v1/categories");
+        const response = await fetch(
+          "https://bakend-wtc.onrender.com/api/v1/categories"
+        );
         if (!response.ok) throw new Error("Failed to fetch categories");
 
         const categoriesData = await response.json();
-        console.log("Fetched categories:", categoriesData);
         setCategories(categoriesData || []);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -175,11 +224,11 @@ const Products = () => {
     };
     fetchCategories();
   }, []);
-  console.log(categories)
+
   const handleDelete = async (id) => {
     try {
       const response = await fetch(
-        `https://bakend-wtc-4.onrender.com/api/v1/products/${id}`,
+        `https://bakend-wtc.onrender.com/api/v1/products/${id}`,
         {
           method: "DELETE",
         }
@@ -195,7 +244,9 @@ const Products = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("https://bakend-wtc-4.onrender.com/api/v1/products");
+        const response = await fetch(
+          "https://bakend-wtc.onrender.com/api/v1/products"
+        );
         if (!response.ok) throw new Error("Failed to fetch products");
         const products = await response.json();
         setData(products);
@@ -212,7 +263,7 @@ const Products = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <Loading />
+        <LoadingComponent />
       </div>
     );
   }
@@ -424,7 +475,8 @@ const Products = () => {
                     <input
                       type="checkbox"
                       checked={mainImageIndex === index}
-                      onChange={() => handleMainImageSelection(index)}
+                      defaultChecked={false}
+                      onChange={(e) => handleMainImageSelection(e, index)}
                       className="mr-2"
                     />
                     Показать в главном окне
@@ -463,14 +515,27 @@ const Products = () => {
                   <tr key={product._id} className="w-full text-white">
                     <td>{product.name}</td>
                     <td>
-                      {product.images && product.images.length > 0 ? (
+                      {product.image.main_images &&
+                      product.image.main_images.length > 0 ? (
                         <img
-                          src={`https://bakend-wtc-4.onrender.com/${product.images[0]}`}
+                          src={`https://bakend-wtc.onrender.com\\${product.image.main_images[0]}`}
                           alt={product.name}
                           className="w-16 h-16 object-cover inline-block mr-2 cursor-pointer"
                           onClick={() =>
                             openImageModal(
-                              `https://bakend-wtc-4.onrender.com/${product.images[0]}`
+                              `https://bakend-wtc.onrender.com\\${product.image.main_images[0]}`
+                            )
+                          }
+                        />
+                      ) : product.image.all_images &&
+                        product.image.all_images.length > 0 ? (
+                        <img
+                          src={`https://bakend-wtc.onrender.com\\${product.image.all_images[0]}`}
+                          alt={product.name}
+                          className="w-16 h-16 object-cover inline-block mr-2 cursor-pointer"
+                          onClick={() =>
+                            openImageModal(
+                              `https://bakend-wtc.onrender.com\\${product.image.all_images[0]}`
                             )
                           }
                         />
@@ -478,10 +543,11 @@ const Products = () => {
                         <span>No Image Available</span>
                       )}
                     </td>
+
                     <td>
                       {product.product_info_pdf ? (
                         <a
-                          href={`https://bakend-wtc-4.onrender.com//${product.product_info_pdf}`}
+                          href={`https://bakend-wtc.onrender.com/${product.product_info_pdf}`}
                           download
                         >
                           Скачать PDF

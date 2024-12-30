@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaSpinner } from "react-icons/fa";
+import { FaSpinner } from 'react-icons/fa';
 import { IoMdPaper } from 'react-icons/io';
 import Loading from '../components/Loading';
 
@@ -11,9 +11,9 @@ const News = () => {
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
-    descriptions: '',
+    description: '',
     date: '',
-    news_type: '', // Ensure this holds the category ID
+    type: '',
     images: [],
   });
 
@@ -21,7 +21,7 @@ const News = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('https://bakend-wtc-4.onrender.com/v1/news');
+        const response = await fetch('https://bakend-wtc.onrender.com/api/v1/layout/about');
         if (!response.ok) throw new Error('Network error');
         const news = await response.json();
         setData(news);
@@ -34,7 +34,7 @@ const News = () => {
 
     const fetchNewsTypes = async () => {
       try {
-        const response = await fetch('https://bakend-wtc-4.onrender.com/v1/news-category');
+        const response = await fetch('https://bakend-wtc.onrender.com/api/v1/layout-type');
         if (!response.ok) throw new Error('Network error');
         const types = await response.json();
         setNewsTypes(types);
@@ -66,43 +66,41 @@ const News = () => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-  
-    // Check all required fields
-    if (!formData.title || !formData.descriptions || !formData.date || !formData.news_type) {
+
+    if (!formData.title || !formData.description || !formData.date || !formData.type) {
       alert('All fields are required.');
       setLoading(false);
       return;
     }
-  
+
     try {
       const form = new FormData();
       form.append('title', formData.title);
-      form.append('descriptions', formData.descriptions);
-      form.append('data', formData.date);
-      form.append('news_type', formData.news_type); // Pass the ObjectId
+      form.append('description', formData.description);
+      form.append('date', formData.date);
+      form.append('type', formData.type);
       formData.images.forEach((file) => form.append('images', file));
-  
+
       const url = isEditing
-        ? `https://bakend-wtc-4.onrender.com/api/v1/news/${editingId}`
-        : 'https://bakend-wtc-4.onrender.com/v1/news/create';
+        ? `https://bakend-wtc.onrender.com/api/v1/layout/about/${editingId}`
+        : 'https://bakend-wtc.onrender.com/api/v1/layout/about-create';
       const method = isEditing ? 'PATCH' : 'POST';
-  
+
       const response = await fetch(url, {
         method,
         body: form,
       });
-  
+
       if (!response.ok) {
         const errorDetails = await response.json();
-        console.error('Backend error response:', errorDetails);
         throw new Error(isEditing ? 'Error updating news' : 'Error adding news');
       }
-  
+
       await response.json();
-      setData(await (await fetch('https://bakend-wtc-4.onrender.com/v1/news')).json());
-  
+      setData(await (await fetch('https://bakend-wtc.onrender.com/api/v1/layout/about')).json());
+
       document.getElementById('my_modal_news').close();
-      setFormData({ title: '', descriptions: '', date: '', news_type: '', images: [] });
+      setFormData({ title: '', description: '', date: '', type: '', images: [] });
       setIsEditing(false);
       setEditingId(null);
     } catch (error) {
@@ -112,35 +110,32 @@ const News = () => {
       setLoading(false);
     }
   };
-  
 
   const handleDelete = async (id) => {
     try {
-        const response = await fetch(`https://bakend-wtc-4.onrender.com/api/v1/news/${id}`, { method: 'DELETE' });
-        if (response.ok) {
-            setData((prevData) => prevData.filter((news) => news._id !== id));
-            alert('News successfully deleted');
-        } else {
-            const errorData = await response.json();
-            console.error('Error deleting news:', errorData);
-            alert(`Error deleting news: ${errorData.message}`);
-        }
+      const response = await fetch(`https://bakend-wtc.onrender.com/api/v1/layout/about/${id}`, { method: 'DELETE' });
+      if (response.ok) {
+        setData((prevData) => prevData.filter((news) => news._id !== id));
+        alert('News successfully deleted');
+      } else {
+        const errorData = await response.json();
+        alert(`Error deleting news: ${errorData.message}`);
+      }
     } catch (error) {
-        console.error('Error deleting news:', error);
-        alert('An unexpected error occurred while trying to delete the news. Please try again later.');
+      console.error('Error deleting news:', error);
+      alert('An unexpected error occurred while trying to delete the news. Please try again later.');
     }
-};
-
+  };
 
   const handleEdit = (newsItem) => {
     setIsEditing(true);
     setEditingId(newsItem._id);
     setFormData({
       title: newsItem.title,
-      descriptions: newsItem.descriptions,
+      description: newsItem.description,
       date: newsItem.date,
-      news_type: newsItem.news_type ? newsItem.news_type._id : '', // Use the ObjectId for editing
-      images: [], // Reset images as the input cannot use existing paths
+      type: newsItem.type ? newsItem.type._id : '',
+      images: [],
     });
     document.getElementById('my_modal_news').showModal();
   };
@@ -155,7 +150,7 @@ const News = () => {
           className="btn btn-primary"
           onClick={() => {
             setIsEditing(false);
-            setFormData({ title: '', descriptions: '', date: '', news_type: '', images: [] });
+            setFormData({ title: '', description: '', date: '', type: '', images: [] });
             document.getElementById('my_modal_news').showModal();
           }}
         >
@@ -175,28 +170,26 @@ const News = () => {
                 value={formData.title}
                 onChange={handleFormChange}
                 className="input input-bordered w-full"
-                placeholder="Title"
                 required
               />
             </label>
             <label className="flex flex-col gap-2">
-  <span>News Type</span>
-  <select
-    name="news_type"
-    value={formData.news_type}
-    onChange={handleFormChange}
-    className="input input-bordered w-full"
-    required
-  >
-    <option value="" disabled>Select news type</option>
-    {newsTypes.map((type) => (
-      <option key={type._id} value={type._id}> {/* Ensure _id is used as the value */}
-        {type.category_name}
-      </option>
-    ))}
-  </select>
-</label>
-
+              <span>News Type</span>
+              <select
+                name="type"
+                value={formData.type}
+                onChange={handleFormChange}
+                className="input input-bordered w-full"
+                required
+              >
+                <option value="" disabled>Select news type</option>
+                {newsTypes.map((type) => (
+                  <option key={type._id} value={type._id}>
+                    {type.category_name}
+                  </option>
+                ))}
+              </select>
+            </label>
             <label className="flex flex-col gap-2">
               <span>Images</span>
               <input
@@ -221,8 +214,9 @@ const News = () => {
             <label className="flex flex-col gap-2">
               <span>Description</span>
               <textarea
-                name="descriptions"
-                value={formData.descriptions}
+              type="text"
+                name="description"
+                value={formData.description}
                 onChange={handleFormChange}
                 className="textarea w-full"
                 rows="3"
@@ -259,22 +253,19 @@ const News = () => {
                   <tr key={newsItem._id}>
                     <td>{newsItem._id}</td>
                     <td>
-  {newsItem.images && newsItem.images.length > 0 ? (
-    <img
-      src={`https://bakend-wtc-4.onrender.com/${newsItem.images[0]}`}
-      alt="News"
-      className="w-16 h-16 object-cover"
-    />
-  ) : (
-    'No Image'
-  )}
-</td>
-
-
+                      {newsItem.images && newsItem.images.length > 0 ? (
+                        <img
+                          src={`https://bakend-wtc.onrender.com//${newsItem.images[0]}`}
+                          alt="News"
+                          className="w-16 h-16 object-cover"
+                        />
+                      ) : (
+                        'No Image'
+                      )}
+                    </td>
                     <td>{new Date(newsItem.date).toLocaleDateString()}</td>
-
-                    <td>{newsItem.news_type ? newsItem.news_type.category_name : 'N/A'}</td> {/* Display category name */}
-                    <td className="max-w-xs truncate">{newsItem.descriptions}</td>
+                    <td>{newsItem.type ? newsItem.type.category_name : 'N/A'}</td>
+                    <td className="max-w-xs truncate">{newsItem.description}</td>
                     <td>
                       <button className="btn bg-slate-800" onClick={() => handleEdit(newsItem)}>Edit</button>
                       <button className="btn bg-red-700" onClick={() => handleDelete(newsItem._id)}>Delete</button>
