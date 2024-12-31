@@ -22,66 +22,83 @@ import NewsCategory from "./pages/NewsCategory";
 const router = createBrowserRouter([
   {
     path: "/app",
-    element: 
-      <App />
-    ,
+    element: (
+      <PrivateRoute>
+        <App />
+      </PrivateRoute>
+    ),
     children: [
       {
         path: "home", 
-        element: 
-        <Home />
-        
+        element: (
+          <PrivateRoute>
+            <Home />
+          </PrivateRoute>
+        ),
       },
       {
         path: "products", 
-        element: 
-        <Products />
-       
+        element: (
+          <PrivateRoute>
+            <Products />
+          </PrivateRoute>
+        ),
       },
       {
-        path: "applications", // Убираем слэш
-        element: 
-        <Applications />
+        path: "applications", 
+        element: (
+          <PrivateRoute>
+            <Applications />
+          </PrivateRoute>
+        ),
       },
       {
-        path: "news", // Убираем слэш
-        element: 
-        <News />
-        
+        path: "news", 
+        element: (
+          <PrivateRoute>
+            <News />
+          </PrivateRoute>
+        ),
       },
       {
-        path: "advertising", // Убираем слэш и приводим путь к нижнему регистру
-        element: 
-        <Advertising />
-        
+        path: "advertising", 
+        element: (
+          <PrivateRoute>
+            <Advertising />
+          </PrivateRoute>
+        ),
       },
       {
-        path: "layout", // Убираем слэш и приводим путь к нижнему регистру
-        element: 
-        <Layout />
-      
+        path: "layout", 
+        element: (
+          <PrivateRoute>
+            <Layout />
+          </PrivateRoute>
+        ),
       },
       {
-        path: "category", // Убираем слэш и приводим путь к нижнему регистру
-        element: 
-        <Category />
+        path: "category", 
+        element: (
+          <PrivateRoute>
+            <Category />
+          </PrivateRoute>
+        ),
       },
       {
-        path: "newsCategory", // Убираем слэш и приводим путь к нижнему регистру
-        element:
-        <NewsCategory />
-      
-      }
+        path: "newsCategory", 
+        element: (
+          <PrivateRoute>
+            <NewsCategory />
+          </PrivateRoute>
+        ),
+      },
     ],
   },
   {
     path: "/",
-    element: (
-        <Login />
-    ),
+    element: <Login />, // Login остаётся без PrivateRoute
   },
 ]);
-
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -92,4 +109,3 @@ root.render(
     </PersistGate>
   </Provider>
 );
-
