@@ -32,7 +32,7 @@ const Create = () => {
     const partnerData = { username, password, role };
 
     try {
-        const response = await fetch('https://bakend-wtc-4.onrender.com/api/v1/auth/create-partnyor', {
+        const response = await fetch('https://bakend-wtc.onrender.com/api/v1/auth/create-partnyor', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

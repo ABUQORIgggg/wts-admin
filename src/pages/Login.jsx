@@ -13,7 +13,7 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('https://bakend-wtc-4.onrender.com/api/v1/auth/login', {
+      const response = await fetch('https://bakend-wtc.onrender.com/api/v1/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
