@@ -40,41 +40,43 @@ const NewsCategory = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      let response;
-      if (isEditing && editingId) {
-        response = await fetch(`https://bakend-wtc.onrender.com/api/v1/news-type/${editingId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
-        });
-      } else {
-        response = await fetch('https://bakend-wtc.onrender.com/api/v1/news-type/create', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
-        });
-      }
-
-      if (response.ok) {
-        const updatedCategory = await response.json();
-        if (isEditing) {
-          setData(data.map((cat) => (cat._id === editingId ? updatedCategory : cat)));
-          setIsEditing(false);
-          setEditingId(null);
+        let response;
+        if (isEditing && editingId) {
+            response = await fetch(`https://bakend-wtc.onrender.com/api/v1/news-type/${editingId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            });
         } else {
-          setData([...data, updatedCategory]);
+            response = await fetch('https://bakend-wtc.onrender.com/api/v1/news-type/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            });
         }
-        document.getElementById('my_modal_news_category').close();
-        setFormData({ type: '' });
-      } else {
-        console.error('Error adding/updating news category');
-      }
+
+        if (response.ok) {
+            const updatedCategory = await response.json();
+            if (isEditing) {
+                setData(data.map((cat) => (cat._id === editingId ? updatedCategory : cat)));
+                setIsEditing(false);
+                setEditingId(null);
+            } else {
+                setData([...data, updatedCategory]);
+            }
+            document.getElementById('my_modal_news_category').close();
+            setFormData({ type: '' });
+        } else {
+            const errorData = await response.json();
+            console.error('Error adding/updating news category:', errorData);
+        }
     } catch (error) {
-      console.error('Error adding/updating news category:', error);
+        console.error('Error adding/updating news category:', error);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
+
 
   const handleDelete = async (id) => {
     setLoading(true);
